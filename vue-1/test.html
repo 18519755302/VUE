@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        {{msg}}
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+        const vue = new Vue({
+            el: '#app',
+            data: {
+                msg: 'complete',
+                Zhao: {
+                    'isTRUE': "IS"
+                }
+            }
+        })
+        vue.msg = 3;
+        vue.$nextTick().then(() => {
+            console.log(vue.msg);
+        })
+        // Vue.nextTick().then(() => {
+        //     console.log(vue.$el.innerHTML);
+        // })
+        // vue.$nextTick(function () {
+        //     console.log('数据已经改变');
+        // })
+        // Vue.nextTick(function () {
+        //     console.log(vue.msg);
+        // })
+        // let obj = {
+        //     name: 'zhao'
+        // }
+        // // 数据劫持的核心属性
+        // Object.defineProperty(obj, 'name', {
+        //     enumerable: true,
+        //     configurable: true,
+        //     get() {
+        //         // 每次获取对象的这个属性的时候，就会被这个get方法给劫持到
+        //         console.log('get执行了')
+        //     },
+        //     // 每次设置这个对象的属性的时候，就会被set方法劫持到
+        //     // 设置的值也会劫持到
+        //     set(newValue) {
+        //         console.log('set方法执行了');
+        //         console.log(newValue)
+
+        //     }
+        // })
+        // obj.name = 1;
+    </script>
+</body>
+
+</html>
