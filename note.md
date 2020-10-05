@@ -613,7 +613,7 @@ observer(data);
   <span>{{msg}}</span>
   ```
 
-> v-text VS Mustache
+> v-text VS Mustache {{xxx}}
 - v-text替换元素中所有的文本，Mustache只替换自己，不清空元素内容
   ```html
   <!-- 渲染为：<span>杉杉最美</span> -->
@@ -625,7 +625,7 @@ observer(data);
 
 > textContent VS innerText
 1. 设置文本替换时，两者都会把指定节点下的所有子节点也一并替换掉。
-2. textContent 会获取所有元素的内容，包括 ```<script>``` 和 ```<style> ```元素，然而 innerText 不会。
+2. textContent 会获取所有元素的内容，包括 ```<script>``` 和 ```<style> ```元素，然而 innerText 不会获取所有元素。
 3. innerText 受 CSS 样式的影响，并且不会返回隐藏元素的文本，而textContent会。
 4. 由于 innerText 受 CSS 样式的影响，它会触发重排（reflow），但textContent 不会。
 5. innerText 不是标准制定出来的 api，而是IE引入的，所以对IE支持更友好。textContent虽然作为标准方法但是只支持IE8+以上的浏览器，在最新的浏览器中，两个都可以使用。
