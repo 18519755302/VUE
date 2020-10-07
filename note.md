@@ -1122,7 +1122,7 @@ observer(data);
 ## 事件修饰符
 
 ### .stop
-- 调用 event.stop，阻止事件冒泡
+- 调用 event.stop，阻止事件冒泡 冒泡：自下向上（自里朝外）
   ```html
   <!-- 此时只弹出button -->
   <div id="app">
@@ -1162,7 +1162,7 @@ observer(data);
   })
   ```
 ### .capture
-- 事件捕获模式
+- 事件捕获模式 捕获：自上向下 （自外向里）与冒泡相反
   ```html
   <!-- 此时先弹出div再弹出button -->
   <div id="app">
@@ -1180,7 +1180,7 @@ observer(data);
   })  
   ```
 ### .self
-- 只当事件是从侦听器绑定的元素本身触发时才触发回调
+- 只当事件是从侦听器绑定的元素本身触发时才触发回调，只会触发绑定本身的事件
   ```html
   <!-- 点击button时，只弹出 button -->
   <div id="app">
@@ -1220,6 +1220,7 @@ observer(data);
   })
   ```
 ### .passive
+- .passive: 告诉浏览器，不会调用"阻止默认事件"
 - 设置 addEventListener 中的 passive 选项
 - 能够提升移动端的性能
 - 2.3.0新增
@@ -1287,7 +1288,7 @@ Vue.config.keyCodes = {
 
 ## 系统修饰键
 可以用如下修饰符来实现仅在按下相应按键时才触发鼠标或键盘事件的监听器。
-修饰键与常规按键不同，在和 keyup 事件一起用时，事件触发时修饰键必须处于按下状态，换句话说，只有在按住 ctrl 的情况下释放其它按键，才能触发 keyup.ctrl。而单单释放 ctrl 也不会触发事件。如果你想要这样的行为，请为 ctrl 换用 keyCode：keyup.17。
+修饰键与常规按键不同，在和 keyup 事件一起用时，事件触发时修饰键必须处于按下状态，换句话说，只有在按住 ctrl 的情况下释放其它按键，才能触发 keyup.ctrl。而单单释放 ctrl 也不会触发事件。如果你想要按ctrl键就执行函数，请把 ctrl 换用 keyCode：keyup.17。
 - .ctrl
 - .alt
 - .shift
