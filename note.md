@@ -746,51 +746,145 @@ observer(data);
   ```html
   <!-- 绑定一个属性 -->
   <img v-bind:src="imageSrc">
-
+  ```
+ ```js
+  const vm = new Vue({
+            el: "#app",
+            data: {
+                imageSrc: '...',
+            }
+  })
+  ```
+  ```html
   <!-- 动态特性名 (2.6.0+) -->
-  <button v-bind:[key]="value"></button>
+  <div id="app" v-bind:[key]='a'>赵拜拜</div>
+  ```
+  ```js
+  const vm = new Vue({
+            el: "#app",
+            data: {
+                key: 'content',
+                a: 'hello'
+            }
+  })
+  ```
+  ```html
+  <!-- 结果 -->
+  <div id="app" content="hello">赵拜拜</div>
+  ```
 
+  ```html
   <!-- 缩写 -->
   <img :src="imageSrc">
-
+ ```
+ ```js
+ const vm = new Vue({
+   el:"img",
+   data:{
+     imageSrc:'....'
+   }
+ })
+ ```
+ ```html
+  <!-- 结果 -->
+  <img src="....">
+ ```
+ ```html
   <!-- 动态特性名缩写 (2.6.0+) -->
   <button :[key]="value"></button>
+  <!-- 假定vue data中定义 key:name value:hello  -->
+  <button name="hello"></button> 
 
-  <!-- 内联字符串拼接 -->
+  <!-- 内联字符串拼接  注意：想拼接字符串外需要加引号-->
   <img :src="'/path/to/images/' + fileName">
-  ```
+ ```
 - 没有参数时，可以绑定到一个包含键值对的对象。注意此时 class 和 style 绑定不支持数组和对象。
   ```html
-  <!-- 绑定一个有属性的对象 -->
+  <!-- 绑定一个有属性的对象 如果属性名中有横杠，那么属性名外必须有引号-->
   <div v-bind="{ id: someProp, 'other-attr': otherProp }"></div>
+  <!-- 结果 -->
+  <div id="..." other-attr="..."></div>
   ```
 - 由于字符串拼接麻烦且易错，所以在绑定 class 或 style 特性时，Vue做了增强，表达式的类型除了字符串之外，还可以是数组或对象。
 
   - 绑定class
     - 对象语法
       ```html
-      <div v-bind:class="{ red: isRed }"></div>
+      <div id="app" v-bind:class="{ red: isRed }"></div>
       ```
-      上面的语法表示 active 这个 class 存在与否将取决于数据属性 isActive 的 真假。
+      ```js
+      const vm = new Vue({
+            el: "#app",
+            data: {
+                isRed: true
+            }
+        })
+      ```
+      ```html
+      <!-- 结果 -->
+      <div id="app" class="red"></div>
+      ```
+      上面的语法表示 red 这个 class 存在与否将取决于数据属性 isRed 的 真假。
 
     - 数组语法
       我们可以把一个数组传给 v-bind:class，以应用一个 class 列表
       ```html
-      <div v-bind:class="[classA, classB]"></div>
+      <div id="app" v-bind:class="[classA, classB]"></div>
+      ```
+      ```js
+       const vm = new Vue({
+            el: "#app",
+            data: {
+                classA: 'red',
+                classB: 'green'
+            }
+        })
+      ```
+      ```html
+      <!-- 结果 -->
+      <div id="app" class="red green"></div>
       ```
     - 在数组语法总可以使用三元表达式来切换class
       ```html
       <div v-bind:class="[isActive ? activeClass : '', errorClass]"></div>
       ```
+    ```js
+      const vm = new Vue({
+            el: "#app",
+            data: {
+                isActive: true,
+                activeClass: 'active',
+                errorClass: 'error'
+            }
+        })
+    ```
+    ```html
+      <div id="app" class="active error"></div>
+    ```
     - 在数组语法中可以使用对象语法
-      ```html
-        <div v-bind:class="[classA, { classB: isB, classC: isC }]">
-        <div v-bind:class="classA" class="red">
-      ```
+    ```html
+    <div id="app" :class="[classA,{green:is}]"></div>
+    ```
+    ```js
+     const vm = new Vue({
+            el: "#app",
+            data: {
+                classA: 'red',
+                is: false
+            }
+        })
+    ```
+    ```html
+    <div id="app" class="red"></div>
+    ```
+    
     - v-bind:class 可以与普通 class 共存
-      ```html
-        <div v-bind:class="classA" class="red">
-      ```
+    ```html
+    <!-- 这句解析完 red会被直接加在class里 -->
+    <div v-bind:class="classA" class="red">
+    <!-- 解析完结果 -->
+    <div class="...,red">
+    ```
     
   - 绑定style
     - 使用对象语法
@@ -798,29 +892,64 @@ observer(data);
       CSS属性名可以用驼峰式(camelCase)或者短横线分隔(kebab-case)来命名
       但是使用短横线分隔时，要用引号括起来
       ```html
-      <div v-bind:style="{ fontSize: size + 'px' }"></div>
+      <div id="app" :style="{'background-color':color}">赵拜拜</div>
+      <!-- 等于 -->
+       <div id="app" :style="{backgroundColor:color}">赵拜拜</div>
+      <!-- 结果 -->
+      <div id="app" style="background-color: red;">赵拜拜</div>
       ```
       ```js
-      data: {
-        size: 30
-      }
+      const vm = new Vue({
+            el: "#app",
+            data: {
+                color: 'red'
+            }
+        })
       ```
       也可以直接绑定一个样式对象，这样模板会更清晰：
       ```html
-      <div v-bind:style="styleObject"></div>
+      <div id="app" v-bind:style="objStyle">赵拜拜</div>
+      <!-- 结果 -->
+      <div id="app" style="width: 100px; height: 100px; background-color: yellow;">
+        赵拜拜
+      </div>
       ```
       ```js
-      data: {
-        styleObject: {
-          fontSize: '13px'
-        }
-      }
+      const vm = new Vue({
+            el: "#app",
+            data: {
+                objStyle: {
+                    width: '100px',
+                    height: '100px',
+                    backgroundColor: 'yellow'
+                }
+            }
+        })
       ```
     - 使用数组语法
       数组语法可以将多个样式对象应用到同一个元素
-      ```html
-      <div v-bind:style="[styleObjectA, styleObjectB]"></div>
-      ```
+     ```html
+     <div id="app" :style="[objStyle1,objStyle2]">赵拜拜</div>
+     <!-- 结果 -->
+     <div id="app" style="width: 100px; background-color: yellow; height: 200px;">
+      赵拜拜
+     </div>
+    ```
+    ```js
+      const vm = new Vue({
+            el: "#app",
+            data: {
+                objStyle1: {
+                    width: '100px',
+                    backgroundColor: 'yellow'
+                },
+                objStyle2: {
+                    height: '200px',
+                }
+            }
+        })
+    ```
+
     - 自动添加前缀
       绑定style时，使用需要添加浏览器引擎前缀的CSS属性时，如 transform，Vue.js会自动侦测并添加相应的前缀。
     - 多重值
@@ -834,20 +963,39 @@ observer(data);
 - 修饰符：
   修饰符 (modifier) 是以英文句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定。
   - .camel
-    由于绑定特性时，会将大写字母转换为小写字母，如：
+    由于Vue绑定特性时，会将大写字母转换为小写字母，如：
     ```html
-    <!-- 最终渲染的结果为：<svg viewbox="0 0 100 100"></svg> -->
-    <svg :viewBox="viewBox"></svg>
+    <!-- 最终渲染的结果为： -->
+    <svg viewbox="0 0 100 100"></svg>
     ```
-    所以，Vue提供了v-bind修饰符 camel，该修饰符允许在使用 DOM 模板时将 v-bind 属性名称驼峰化，例如 SVG 的 viewBox 属性
+    所以，Vue提供了v-bind修饰符 camel，该修饰符允许在使用 DOM 模板时将 v-bind 属性名称驼峰化，例如 SVG 的 viewBox 属性(就是把横杠后的单词第一个字符大写)
     ```html
-    <svg :view-box.camel="viewBox"></svg>
+    <svg id='app' :view-box.camel="viewBox"></svg>
+    <!-- 结果 -->
+    <svg id='app' viewBox="0 0 100 100"></svg>
     ```
-
+    ```js
+    const vm = new Vue({
+            el: "#app",
+            data: {
+                viewBox: '0 0 100 100'
+            }
+    })
+    ```
   - .prop
     被用于绑定 DOM 属性 (property)
     ```html
-    <div v-bind:text-content.prop="text"></div>
+    <div id="app" :text-content.prop="text"></div>
+    <!-- 结果 -->
+    <div id="app">hello</div>
+    ```
+    ```js
+    const vm = new Vue({
+            el: "#app",
+            data: {
+                text: 'hello'
+            }
+        })
     ```
     
   - .sync
