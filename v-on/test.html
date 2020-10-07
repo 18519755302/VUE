@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button {
+            display: inline;
+        }
+    </style>
+    <script src="../vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        小鸡正在
+        <button @click='makeEgg(2,$event)'>下蛋</button>
+        <button v-on:[event]='makeEgg(2,$event)'>下蛋</button>
+        <button v-on='{mousedown: makeEgg, mouseup: makeEgg}'>下蛋</button>
+        <span>{{egg}}</span>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                egg: 'o',
+                event: 'click'
+            },
+            methods: {
+                //$event 就是addEventListener中的鼠标事件e
+                makeEgg(num, e) {
+                    console.log(num, e, this);
+                    this.egg += 'o';
+                }
+            }
+
+        })
+    </script>
+</body>
+
+</html>

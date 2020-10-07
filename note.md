@@ -1048,6 +1048,7 @@ observer(data);
     vm.addCounter();
   ```
 - 除了直接绑定到一个方法，也可以在内联JavaScript 语句中调用方法：
+  
   ```html
   <div id="app">
     <button v-on:click="addCounter(5)">点击加 5</button>
@@ -1062,7 +1063,7 @@ observer(data);
     },
     methods: {
       addCounter: function (num) {
-        this.counter += 5;
+        this.counter += num;
       }
     }
   })
@@ -1080,7 +1081,7 @@ observer(data);
     methods: {
       addCounter: function (num, e) {
         this.counter += 5;
-        cosnole.log(e.target)；        
+        console.log(e.target)；        
       }
     }
   })
