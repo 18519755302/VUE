@@ -14,13 +14,15 @@
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" @click="alert">
         小鸡正在
-        <button @click='makeEgg(2,$event)'>下蛋</button>
+        <button @keyup.17='makeEgg(2,$event)'>下蛋</button>
         <button v-on:[event]='makeEgg(2,$event)'>下蛋</button>
         <button v-on='{mousedown: makeEgg, mouseup: makeEgg}'>下蛋</button>
         <span>{{egg}}</span>
+        <input type="text" @click.left="alert1">
     </div>
+
     <script>
         const vm = new Vue({
             el: '#app',
@@ -31,8 +33,15 @@
             methods: {
                 //$event 就是addEventListener中的鼠标事件e
                 makeEgg(num, e) {
+                    alert('gou');
                     console.log(num, e, this);
                     this.egg += 'o';
+                },
+                alert() {
+                    alert('gou gou gou gou!!!');
+                },
+                alert1() {
+                    alert('gou gou !!!');
                 }
             }
 
