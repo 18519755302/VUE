@@ -1468,6 +1468,7 @@ const vm = new Vue({
 
 ### key的使用方法
 预期值：number | string
+key不可以在<template>语句里使用，可以在<template>子级语句中使用。
 有相同父元素的子元素必须有独特的 key，重复的 key 会造成渲染错误，key应唯一。
 ```html
 <ul id="app">
