@@ -1468,7 +1468,7 @@ const vm = new Vue({
 
 ### key的使用方法
 预期值：number | string
-key不可以在<template>语句里使用，可以在<template>子级语句中使用。
+key不可以在template语句里使用，可以在template子级语句中使用。
 有相同父元素的子元素必须有独特的 key，重复的 key 会造成渲染错误，key应唯一。
 ```html
 <ul id="app">
@@ -1695,6 +1695,8 @@ select | value | change |
   <input v-model="message">
   <p>Message 为: {{ message }}</p>
 </div>
+<!-- v-model 相当于 -->
+<input id='app' type="text" @input="msg=$event.target.value" :value="msg">
 ```
 ```js
 const vm = new Vue({
@@ -1793,7 +1795,7 @@ const vm = new Vue({
 ```
 
 ## select
-匹配的值为option中的汉字
+匹配的值为option中的汉字,如果想匹配value中的值，就在option里加入value
 ### 单选
 ```html
 <div id="app">
@@ -1804,6 +1806,12 @@ const vm = new Vue({
   </select>
   <span>选择: {{ selected === '请选择' ? '' : selected }}</span>
 </div>
+<!-- 匹配value -->
+ <select v-model="selected">
+            <option value='1'>A</option>
+            <option value='2'>B</option>
+            <option value='3'>C</option>
+  </select>
 ```
 ```js
 const vm = new Vue({
