@@ -2047,16 +2047,16 @@ vm.name = 'duyi';
 假如说，我们有一个计算属性A，它需要遍历一个巨大的数组并且做巨大的计算。然后我们需要使用到这个计算属性A，如果没有缓存，我们就会再次执行A的函数，这样性能开销就变得很大了。
 
 ## 深入计算属性
-计算属性除了写成一个函数之外，还可以写成一个对象，对象内有两个属性，getter&setter，这两个属性皆为函数，写法如下：
+计算属性除了写成一个函数之外，还可以写成一个对象，对象内有两个属性，get&set，这两个属性皆为函数，写法如下：
 ```js
 const vm = new Vue({
   el: '#app',
   computed: {
     fullName: {
-      getter () {
+      get () {
         // 一些代码
       },
-      setter () {
+      set () {
         // 一些代码
       }
     }
@@ -2064,9 +2064,10 @@ const vm = new Vue({
 })
 ```
 
-### getter 读取
-在前面，我们直接将计算属性写成了一个函数，这个函数即为getter函数。也就是说，计算属性默认只有getter。
-getter的this，被自动绑定为Vue实例。
+### get 读取
+在前面，我们直接将计算属性写成了一个函数，这个函数即为get函数。也就是说，计算属性默认只有get。
+get的this，被自动绑定为Vue实例。
+使用{{computed}}会自动调用get方法
 
 > 何时执行？
 
@@ -2080,7 +2081,7 @@ const vm = new Vue({
   },
   computed: {
     reversedMsg: {
-      getter () {
+      get () {
         return this.msg.split('').reverse().join('');
       }
     }
@@ -2088,11 +2089,11 @@ const vm = new Vue({
 })
 ```
 
-### setter 设置
+### set 设置
 可选，set函数在给计算属性重新赋值时会执行。
 参数：为被重新设置的值。
-setter的this，被自动绑定为Vue实例。
-
+set的this，被自动绑定为Vue实例。
+当 reverseMsg = 'xxxx'时 set方法会被调用，参数为 'xxxx'
 
 ```js
 const vm = new Vue({
@@ -2103,10 +2104,10 @@ const vm = new Vue({
   },
   computed: {
     reversedMsg: {
-      getter () {
+      get () {
         return this.msg.split('').reverse().join('');
       },
-      setter (newVal) {
+      set (newVal) {
         this.firstStr = newVal[0];
       }
     }
