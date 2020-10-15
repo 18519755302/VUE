@@ -2450,6 +2450,8 @@ var unwatch = vm.$watch('msg', function () {
 ```
 
 ## 侦听器 vs 计算属性
+
+0. 侦听器不写immediate时在属性改变时才会启动，只要侦听器启动，它会在计算属性之前执行
 1. 两者都可以观察和响应Vue实例上的数据的变动。
 2. watch擅长处理的场景是：一个数据影响多个数据。计算属性擅长处理的场景是：多个数据影响一个数据。
 
@@ -2475,7 +2477,7 @@ var vm = new Vue({
 # 练习_仿百度搜索联想
 url: https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su
 
-请求方式：jsonp
+请求方式(服务器返回的数据类型)：jsonp
 
 发送参数：
 1. wd：字符串，搜索的文字
