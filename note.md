@@ -2598,6 +2598,7 @@ this.$http.jsonp('https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su', {
   jsonp: 'cd', //jsonp默认是callback,百度缩写成了cb，所以需要指定下 
 })
   .then(res => {
+    //这相当于正确信息的回调函数
     console.log(res);
   })
 ```
