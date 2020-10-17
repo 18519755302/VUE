@@ -3081,6 +3081,11 @@ const vm = new Vue({
 ### destroyed
 Vue 实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除。
 
+```js
+   const vm = new Vue({el:'#app'});
+   //手动销毁vm
+   vm.$destroy();
+```
 # 练习_bilibili首页
 
 1.轮播图

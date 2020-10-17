@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../vue.js"></script>
+</head>
+
+<body>
+    <div id="app">{{msg}}</div>
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                msg: "hello world"
+            },
+            methods: {
+                save() {
+
+                }
+            },
+            watch: {
+                msg: {
+                    handler() {
+                        console.log('我是侦听器');
+                    },
+                    immediate: true
+                }
+            },
+            beforeCreate() {
+                //刚出生
+                console.log(this.msg);
+                console.log(this.save);
+                console.log('------beforcreate----');
+            },
+            created() {
+                //出生阶段完成
+                console.log(this.msg);
+                console.log(this.save);
+                console.log('------created-----');
+            },
+            beforeMount() {
+                //挂载前 拥有未变身以前的el
+                console.log(this.$el);
+                console.log('------beforeMount------');
+            },
+            mounted() {
+                //挂载后 拥有变身以后的el
+                console.log(this.$el);
+                console.log('------mounted------');
+            },
+            beforeUpdate() {
+                //数据改变之前 数据会改变但还没有渲染到dom上
+                console.log(this.$el.outerHTML);
+                console.log('------beforeUpdate------');
+            },
+            updated() {
+                //数据改变之后 改变的数据会渲染到dom上
+                console.log(this.$el.outerHTML);
+                console.log('-------updated------');
+            },
+            beforeDestroy() {
+                //vue实例(vm)销毁之前
+                console.log('-------beforeDestroy-----');
+            },
+            destroyed() {
+                //vue实例(vm)销毁之后
+                console.log('-------destroyed------');
+            }
+
+        })
+        //手动销毁vm
+        vm.$destroy();
+    </script>
+</body>
+
+</html>
