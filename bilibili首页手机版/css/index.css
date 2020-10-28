@@ -1,0 +1,357 @@
+html,
+body {
+    height: 100%;
+}
+
+#app {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+/* 顶部 */
+.header .iconfont {
+    font-size: 24px;
+}
+
+#app .header .firstLine {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    justify-content: space-around;
+    background-color: #fff;
+    padding: 13px 0px;
+    position: fixed;
+    z-index: 5;
+}
+
+#app .header .firstLine .login {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    color: #fb7299;
+    line-height: 32px;
+    border-radius: 50%;
+    background-color: #f4f4f4;
+}
+
+#app .header .firstLine .search-input {
+    width: 170px;
+    height: 24px;
+    background-color: #f4f4f4;
+    text-align: start;
+    line-height: 24px;
+    border-radius: 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #999;
+}
+
+#app .header .firstLine .search-input i {
+    margin-left: 8px;
+    margin-right: 3px;
+    font-size: 15px;
+}
+
+#app .header .firstLine .search-input span {
+    font-size: 13px;
+}
+
+#app .header .firstLine .game {
+    padding-top: 2px;
+}
+
+#app .header .firstLine .game img {
+    border-radius: 50%;
+}
+
+#app .header .firstLine .playgame i {
+    font-size: 18px;
+}
+
+/* 导航 */
+.header .nav {
+    position: fixed;
+    width: 100%;
+    top: 57px;
+    left: 0;
+    display: flex;
+    z-index: 2;
+}
+
+/* 去掉滚动条 */
+.header .nav .nav-all::-webkit-scrollbar {
+    display: none;
+}
+
+/* 导航 横排 */
+.header .nav .line {
+    width: 100%;
+    padding-top: 2px;
+    background-color: #fff;
+}
+
+.header .nav .line .nav-all {
+    display: flex;
+    white-space: nowrap;
+    overflow-x: auto;
+    color: #757575;
+    width: 88%;
+}
+
+.header .nav .line .nav-all .single {
+    padding: 13px 2px;
+    margin: 0px 8px 8px 8px;
+    border: 2px solid transparent;
+}
+
+.header .nav .nav-all .single.active {
+    border-bottom: 2px solid hotpink;
+    color: hotpink;
+}
+
+.header .nav .down {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 2;
+    text-align: center;
+}
+
+/* 导航 竖排 */
+.header .nav .vertical {
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    z-index: 3;
+    transition: top .2s;
+    margin: 0 auto;
+}
+
+.header .nav .vertical.hide {
+    position: absolute;
+    top: -150px;
+}
+
+.header .nav .vertical .nav-all {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-align: center;
+    padding: 5px 5px;
+    width: 100%;
+    background-color: #fff;
+}
+
+.header .nav .vertical .single {
+    width: 12%;
+    font-size: 15px;
+    padding: 8px 0px;
+    margin: 0px 6px;
+    color: #757575;
+    border: 2px solid transparent;
+}
+
+.header .nav .up {
+    margin: -14px auto;
+    width: 20px;
+    /* border: 1px solid; */
+}
+
+/* banner 图 */
+.banner {
+    position: relative;
+    top: 110px;
+    left: 0;
+}
+
+.banner .banner-list {
+    position: absolute;
+    width: 356px;
+    height: 120px;
+    border-radius: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    /* border: 1px solid black; */
+    overflow: hidden;
+}
+
+.banner .banner-list ul {
+    /* display: flex; */
+    position: absolute;
+    width: calc(356px * 4);
+    left: 0;
+}
+
+.banner .banner-list ul li {
+    float: left;
+    width: 356px;
+    height: 120px;
+}
+
+.banner .banner-list li img {
+    width: 100%;
+    height: 100%;
+}
+
+/* banner 点 */
+.banner .banner-points {
+    position: absolute;
+    left: 50%;
+    top: 100px;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.banner .banner-points ul {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 0 7px;
+    border-radius: 7px;
+}
+
+.banner .banner-points ul li {
+    width: 8px;
+    height: 8px;
+    background-color: whitesmoke;
+    border-radius: 50%;
+    margin: 4px 2px;
+}
+
+.banner .banner-points ul li.active {
+    background-color: hotpink;
+}
+
+/* video */
+.videoBox {
+    position: relative;
+    top: 240px;
+    width: 100%;
+    /* background-color: rgba(33, 33, 33, .1); */
+}
+
+.videoBox .video-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.videoBox .video-list li {
+    width: 50%;
+}
+
+.videoBox .video-list .video {
+    margin: 10px;
+    /* background-color: #fff; */
+}
+
+.videoBox .video-list .video .poster {
+    position: relative;
+    width: 100%;
+    height: 106px;
+}
+
+.videoBox .video-list .video .poster .video-logo {
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.videoBox .video-list .video .poster img {
+    width: 100%;
+    height: 100%;
+}
+
+.videoBox .video-list .video .poster .playRank {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 25px;
+    bottom: 0px;
+    align-items: center;
+    background-image: linear-gradient(rgba(33, 33, 33, 0), rgba(33, 33, 33, 0.6));
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.videoBox .video-list .video .poster .playRank span {
+    display: inline-block;
+    margin-left: 16px;
+    margin-bottom: 3px;
+    font-size: 13px;
+    color: #fff;
+    align-self: center;
+}
+
+.videoBox .video-list .video .poster .playRank .play,
+.videoBox .video-list .video .poster .playRank .rank {
+    width: 50%;
+    /* border: 1px solid; */
+}
+
+.videoBox .video-list .video .poster .playRank .play {
+    margin-left: 10px;
+}
+
+.videoBox .video-list .playRank svg {
+    position: absolute;
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    fill: #fff;
+}
+
+.videoBox .video-list .video .title {
+    width: 100%;
+    height: 38px;
+    line-height: 20px;
+    font-size: 13px;
+    margin-top: 4px;
+    /* 多行打点 */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.videoBox::after {
+    content: '';
+    display: block;
+    height: 65px;
+}
+
+/* footer */
+.footer {
+    position: fixed;
+    width: 100%;
+    height: 50px;
+    background-color: #fff;
+    bottom: 0;
+    border-top: 1px solid rgba(33, 33, 33, .1);
+}
+
+.footer ul {
+    display: flex;
+    justify-content: space-around;
+}
+
+.footer ul li {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 50px;
+    color: rgba(0, 0, 0, 0.4);
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.footer ul li i {
+    font-size: 19px;
+    padding-bottom: 7px;
+}
+
+.footer ul li.active {
+    color: hotpink;
+}

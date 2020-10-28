@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>sticky</title>
+    <style>
+        /* li.item {
+            background: lightblue;
+            list-style: none;
+            height: 50px;
+            line-height: 50px;
+        }
+
+        ul.container {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        li.item.sticky {
+            position: sticky;
+            position: -webkit-sticky;
+            top: 0;
+            left: 0;
+            background: lightcoral;
+        } */
+        /* .wrapper {
+            width: 600px;
+        }
+
+        .container {
+            display: flex;
+            width: 400px;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .item {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            background-color: antiquewhite;
+        } */
+        .wrapper {
+            position: relative;
+            top: 100px;
+            height: 400px;
+            width: 200px;
+            border: 1px solid black;
+            overflow-y: scroll;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <ul class="container">
+            <li class="item">num1：Be calm~ Have Faith~</li>
+            <li class="item">num2：Be calm~ Have Faith~</li>
+            <li class="item">num3：Be calm~ Have Faith~</li>
+            <li class="item">num4：Be calm~ Have Faith~</li>
+            <li class="item">num5：Be calm~ Have Faith~</li>
+            <li class="item">num6：Be calm~ Have Faith~</li>
+            <li class="item">num7：Be calm~ Have Faith~</li>
+            <li class="item">num8：Be calm~ Have Faith~</li>
+            <li class="item">num9：Be calm~ Have Faith~</li>
+            <li class="item">num10:Be calm~ Have Faith~</li>
+            <li class="item">num11:Be calm~ Have Faith~</li>
+            <li class="item">num12:Be calm~ Have Faith~</li>
+            <li class="item">num13:Be calm~ Have Faith~</li>
+            <li class="item">num14:Be calm~ Have Faith~</li>
+            <li class="item">num15:Be calm~ Have Faith~</li>
+            <li class="item">num16:Be calm~ Have Faith~</li>
+            <li class="item">num17:Be calm~ Have Faith~</li>
+            <li class="item">num18:Be calm~ Have Faith~</li>
+            <li class="item">num19:Be calm~ Have Faith~</li>
+            <li class="item">num20:O.Be calm~ Have Faith~</li>
+            <li class="item sticky">num21:~~~ 滑到顶部就置顶^_^ ~~~</li>
+            <li class="item">num22:Be calm~ Have Faith~</li>
+            <li class="item">num22:Be calm~ Have Faith~</li>
+            <li class="item">num23:Be calm~ Have Faith~</li>
+            <li class="item">num24:Be calm~ Have Faith~</li>
+            <li class="item">num25:Be calm~ Have Faith~</li>
+            <li class="item">num26:Be calm~ Have Faith~</li>
+            <li class="item">num27:Be calm~ Have Faith~</li>
+            <li class="item">num28:Be calm~ Have Faith~</li>
+            <li class="item">num29:Be calm~ Have Faith~</li>
+            <li class="item">num30:Be calm~ Have Faith~</li>
+            <li class="item">num31:Be calm~ Have Faith~</li>
+            <li class="item">num32:Be calm~ Have Faith~</li>
+            <li class="item">num33:Be calm~ Have Faith~</li>
+            <li class="item">num34:Be calm~ Have Faith~</li>
+            <li class="item">num35:Be calm~ Have Faith~</li>
+            <li class="item">num36:Be calm~ Have Faith~</li>
+            <li class="item">num37:Be calm~ Have Faith~</li>
+            <li class="item">num38:Be calm~ Have Faith~</li>
+            <li class="item">num39:Be calm~ Have Faith~</li>
+            <li class="item">num40:Be calm~ Have Faith~</li>
+            <li class="item">num41:Be calm~ Have Faith~</li>
+            <li class="item">num42:Be calm~ Have Faith~</li>
+            <li class="item">num43:Be calm~ Have Faith~</li>
+            <li class="item">num44:Be calm~ Have Faith~</li>
+            <li class="item">num45:Be calm~ Have Faith~</li>
+            <li class="item">num46:Be calm~ Have Faith~</li>
+            <li class="item">num47:Be calm~ Have Faith~</li>
+            <li class="item">num48:Be calm~ Have Faith~</li>
+            <li class="item">num49:Be calm~ Have Faith~</li>
+            <li class="item">num50:Be calm~ Have Faith~</li>
+        </ul>
+    </div>
+    <script>
+        let s = document.getElementsByClassName('wrapper')[0];
+        s.addEventListener('scroll', e => {
+            console.log(e.target.scrollTop);
+
+        })
+
+        let arr = [1, 2, 3];
+        let brr = arr.map(e => {
+            console.log('11111');
+            return e;
+        });
+        console.log('777777');
+    </script>
+</body>
+
+</html>
