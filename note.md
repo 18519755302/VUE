@@ -3165,7 +3165,7 @@ const vm = new Vue({
 
 ### 局部组件
 在components选项中定义要使用的组件。
-对于 components 对象中的每一个属性来说，其属性名就是自定义元素的名字，其属性值就是这个组件的选项对象。
+对于 components 对象中的每一个属性来说，其属性名就是自定义元素的名字，其属性值就是这个组件的选项对象。优先级高于全局属性
 
 示例：
 ```html
@@ -3218,7 +3218,7 @@ Vue.component('MyComponent', {/***/});
 另：我们强烈推荐遵循 W3C 规范中的自定义组件名 (字母全小写且必须包含一个连字符)。这会帮助你避免和当前以及未来的 HTML 元素相冲突。
 
 ### 组件复用
-可以将组件进行任意次数的复用：
+可以将组件进行任意次数的复用(自闭合组件不能复用)：
 ```html
 <div id="#app">
   <button-counter></button-counter>
@@ -3346,6 +3346,61 @@ person: {
   :age="person.age"
 ></my-component>
 ```
+如果想组件内部再套组件，最好用全局组件，局部组件需要在组件内部写components
+举例：
+```html
+<div id="app">
+        <video-list :list="list"></video-list>
+</div>
+```
+```js
+ let videoc = {
+            props: ['poster', 'play', 'rank', 'title'],
+            template: `<div class="video-item">
+                <div class="poster">
+                    <img :src="poster" alt="">
+                    <div class="info">
+                        <div class="play">{{play}}</div>
+                        <div class="rank">{{rank}}</div>
+                    </div>
+                </div>
+                <div class="title">{{title}}</div>
+            </div>`
+        };
+        let list = {
+            props: ['list'],
+            template: `<div class="video-list">
+                <videoc v-for="video of list" v-bind="video"></videoc>
+            </div>`,
+            components: {
+              //在这，需要引入组件
+                videoc: videoc
+            }
+        };
+ const vm = new Vue({
+            el: '#app',
+            data: {
+                list: []
+            },
+            created() {
+                axios.get('https://developer.duyiedu.com/vue/bz/video', {
+                    params: {
+                        start: 0,
+                        offset: 12
+                    }
+                }).then(res => {
+                    this.list = res.data.data;
+                    console.log(this.list);
+                })
+            },
+            components: {
+                //在vim中只用写video-list一个组件
+                videoList: list,
+            }
+        })
+
+```
+
 
 # 组件_Prop验证
 我们可以为组件的 prop 指定验证要求，例如你可以要求一个 prop 的类型为什么。如果说需求没有被满足的话，那么Vue会在浏览器控制台中进行警告，这在开发一个会被别人用到的组件时非常的有帮助。
@@ -3375,12 +3430,13 @@ Vue.component('my-component', {
   props: {
     title: {
       type: String, // 检查 prop 是否为给定的类型
-      default: '杉杉最美',   // 为该 prop 指定一个默认值，对象或数组的默认值必须从一个工厂函数返回，如：default () { return {a: 1, b: 10} },
+      default: '杉杉最美',   // 为该 prop 指定一个 默认值（在参数list不传时） 对象或数组的默认值必须从一个工厂函数返回，如：default () { return {a: 1, b: 10} },
       required: true, // 定义该 prop 是否是必填项
       validator (prop) {  // 自定义验证函数，该prop的值回作为唯一的参数代入，若函数返回一个falsy的值，那么就代表验证失败
         return prop.length < 140;
       }
     }
+
   }
 })
 ```
@@ -3389,16 +3445,17 @@ Vue.component('my-component', {
 
 # 组件_单向数据流
 
-所有的 prop 都使得其父子 prop 之间形成了一个**单向下行绑定**：父级 prop 的更新会向下流动到子组件中，但是反过来则不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流向难以理解。
+所有的 prop 都使得其父子 prop 之间形成了一个**单向下行绑定**：父级 prop 的更新(比如说vm的更新)会向下流动到子组件中，但是反过来则不行。这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流向难以理解。
 
 这里有两种常见的试图改变一个 prop 的情形：
 
-1. 这个 prop 用来传递一个初始值；这个子组件接下来希望将其作为一个本地的 prop 数据来使用，在后续操作中，会将这个值进行改变。在这种情况下，最好定义一个本地的 data 属性并将这个 prop 用作其初始值：
+1. 这个 prop 用来传递一个初始值；这个子组件接下来希望将其作为一个本地的 prop 数据来使用(如果prop是数组或对象需要深度克隆才可以，因为传递的是引用，所以父组件和子组件数据都会改变)，在后续操作中，会将这个值进行改变。在这种情况下，最好定义一个本地的 data 属性并将这个 prop 用作其初始值：
 
 ```js
 props: ['initialCounter'],
 data: function () {
   return {
+    //如果是数组或对象需要深度克隆
     counter: this.initialCounter
   }
 }
@@ -3476,6 +3533,29 @@ Vue.component('base-input', {
     </label>
   `,
 })
+```
+举例：把单选框特效赋给input框
+```html
+<div id="app">
+        <haha type="radio"></haha>
+</div>
+```
+```js
+let haha = {
+            //$attrs中存着{type:'radio'}
+            template: `<div><input v-bind="$attrs"></div>`,
+            inheritAttrs: false,
+            mounted() {
+                console.log(this.$attrs);
+            }
+        }
+        let vm = new Vue({
+            el: '#app',
+            components: {
+                haha: haha
+            }
+        })
+
 ```
 
 注意：inheritAttrs: false 选项不会影响 style 和 class 的绑定。
@@ -3614,6 +3694,26 @@ methods: {
   }
 }
 ```
+举例：使用$emit
+```html
+ <!-- 使用$emit -->
+ <zujian @shijian-c="countjia" :num='count'></zujian>
+```
+```js
+//使用$emit
+  Vue.component('zujian', {
+    props: {
+        'num': Number
+    },
+    template: `<div><button @click='$emit("shijian-c",2)'>{{num}}</button></div>`
+  });
+  //vm中
+  methods: {
+    countjia(event) {
+        this.count += event;
+    }
+  }
+```
 
 ## 事件名
 不同于组件和prop，事件名不存在任何自动化的大小写转换。而是触发的事件名需要完全匹配监听这个事件所有的名称。如果触发一个camelCase名字的事件：
@@ -3671,6 +3771,22 @@ Vue.component('base-input', {
   `
 })
 ```
+举例：使用$listeners
+```html
+<z-listener @focus="onfocus" @blur="onblur"></z-listener>
+```
+```js
+//使用listener
+Vue.component('z-listener', {
+  mounted() {
+    console.log(this.$listeners);
+  },
+  template: `<label>姓名：<input v-on="$listeners"></label>`
+})
+```
+
+
+
 
 ## 在组件上使用 v-model
 由于自定义事件的出现，在组件上也可以使用v-model指令。
@@ -3717,6 +3833,31 @@ Vue.component('base-input', {
 }) 
 ```
 这样操作后，v-model就可以在这个组件上工作起来了。
+
+举例：使用v-model
+```html
+<z-model v-model="ztext"></z-model>
+```
+```js
+//使用v-model 因为v-model是语法糖 所以props 中必须有value
+Vue.component('z-model', {
+    props: ['value'],
+    template: `<input :value="value" @input="$emit('input', $event.target.value)"/>`
+})
+```
+举例：不使用v-model 实现双向绑定
+```html
+<!-- 不使用v-model 实现双向绑定 -->
+<un-model :zvalue='ztext' @zinput="ztext = $event"></un-model>
+```
+```js
+//不使用v-model 实现双向绑定
+ Vue.component('un-model', {
+    props: ['zvalue'],
+    template: `<input :value='zvalue' @input="$emit('zinput',$event.target.value)" />`
+ })
+```
+
 
 通过上面的学习，我们知道了，一个组件上的 v-model 默认会利用名为 value 的 prop 和名为 input 的事件，但是像单选框、复选框等类型的输入控件可能会将 value 特性用于不同的目的。碰到这样的情况，我们可以利用 model 选项来避免冲突：
 ```js
@@ -3808,11 +3949,28 @@ Vue.component('base-input', {
   @update:value="searchText = $event"
 />
 ```
+举例：使用.sync
+```html
+<z-sync :value.sync='zsynctext'></z-sync>
+```
+```js
+//使用sync 实现双向绑定 props中value，$emit中的update:value需固定
+Vue.component('z-sync', {
+  props: ['value'],
+  template: `<input :value='value' @input="$emit('update:value',$event.target.value)" />`
+})
+```
+
 
 当我们用一个对象同时设置多个prop时，也可以将.sync修饰符和 v-bind配合使用：
 ```html
 <base-input v-bind.sync="obj"></base-input>
 ```
+相当于
+```html
+<base-input :a.sync="value1" :b.sync="value2" :c.sync="value2" :d.sync="value2"></base-input>
+```
+
 
 **注意：**
 - 带有.sync修饰符的v-bind指令，只能提供想要绑定的属性名，**不能**和表达式一起使用，如：``:title.sync="1+1"``，这样操作是无效的
