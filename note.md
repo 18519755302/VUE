@@ -4010,6 +4010,12 @@ Vue.component('z-sync', {
   <slot></slot>
 </div>
 ```
+等于
+```html
+<div>
+  写在组件标签结构中的内容
+</div>
+```
 
 当组件渲染时，``<slot></slot>``将会被替换为“写在组件标签结构中的内容”。
 插槽内可以包含任何模板代码，包括HTML和其他组件。
@@ -4047,8 +4053,14 @@ Vue.compopnent('my-cmp', {
   `
 })
 ```
-当使用组件未提供插槽时，后备内容将会被渲染。如果提供插槽，则后备内容将会被取代。
-
+当使用组件未提供插槽时，后备内容将会被渲染。
+```html
+<my-cmp><my-cmp>
+```
+如果提供插槽，则后备内容将会被取代。
+```html
+<my-cmp>有我，就不会显示slot中后备内容</my-cmp>
+```
 ## 具名插槽
 有时我们需要多个插槽，如``<my-cmp>``组件：
 ```js
@@ -4154,7 +4166,7 @@ Vue.component('my-cmp', {
 </div>
 ```
 
-### 独占默认插槽的缩写语法
+### 独占默认插槽的缩写语法（不能跟具名插槽同时使用）
 当被提供的内容只有默认插槽时，组件的标签可以被当作插槽的模板来使用，此时，可以将``v-slot``直接用在组件上：
 ```html
 <my-cmp v-slot:default="slotProps">
@@ -4208,6 +4220,26 @@ Vue.component('my-cmp', {
     ...
   </template>
 </my-cmp>
+```
+举例：
+```html
+<!-- 动态插槽 -->
+<slot-dt>
+    <template v-slot:[dongtai]>
+        我是动态的
+    </template>
+</slot-dt>
+```
+```js
+Vue.component('slot-dt', {
+    template: `<div><slot name="header"></slot></div>`
+})
+const vm = new Vue({
+    el: '#app',
+    data: {
+        dongtai: 'header'
+    }
+})
 ```
 
 ## 具名插槽的缩写
