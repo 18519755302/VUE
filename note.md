@@ -3520,6 +3520,7 @@ Vue.component('my-cmp', {
 
 ```js
 Vue.component('base-input', {
+  //``inheritAttrs: false`` 和 ``$attrs`` 相互配合
   inheritAttrs: false,
   props: ['label', 'value'],
   template: `
@@ -3541,7 +3542,7 @@ Vue.component('base-input', {
 </div>
 ```
 ```js
-let haha = {
+        let haha = {
             //$attrs中存着{type:'radio'}
             template: `<div><input v-bind="$attrs"></div>`,
             inheritAttrs: false,
@@ -4407,6 +4408,47 @@ this.$root.baz()
 ```
 在demo或在有少量组件的小型应用中使用是非常方便的。但是在大型应用里使用就会很复杂了。所以，我们还是要用Vuex（后面会学）来管理应用的状态。
 
+举例：使用this.$root
+```html
+ <div id="app">
+        <my-cmp>
+            <my-cmp1>
+                <my-cmp2></my-cmp2>
+            </my-cmp1>
+        </my-cmp>
+ </div>
+```
+```js
+        Vue.component('my-cmp', {
+            template: `<div>1<slot></slot></div>`,
+            created() {
+                console.log(this.$root.name);
+            }
+        })
+        Vue.component('my-cmp1', {
+            template: `<div>2<slot></slot></div>`,
+            created() {
+                console.log(this.$root.name);
+            }
+        })
+        Vue.component('my-cmp2', {
+            template: `<div>3</div>`,
+            created() {
+                console.log(this.$root.name);
+            }
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                name: 'mao~'
+            },
+            created() {
+                console.log(this.$root.name);
+            }
+        })
+```
+
+
 ### 访问父级组件实例
 
 在子组件中，可以通过 $parent 访问 父组件实例。这可以替代将数据以prop的方式传入子组件的方式。
@@ -4431,6 +4473,43 @@ this.$root.baz()
 ```js
 var share = this.$parent.share || this.$parent.$parent.share;
 ```
+举例：this.$parent
+```html
+    <div id="app">
+        <my-cmp>
+            <my-cmp1>
+                <my-cmp2></my-cmp2>
+            </my-cmp1>
+        </my-cmp>
+    </div>
+```
+```js
+          Vue.component('my-cmp', {
+            data() {
+                return {
+                    share: 'share'
+                }
+            },
+            template: `<div>1<slot></slot></div>`,
+            created() {
+                console.log(this.share);
+            }
+        })
+        Vue.component('my-cmp1', {
+            template: `<div>2<slot></slot></div>`,
+            created() {
+                console.log(this.$parent.share);
+            }
+        })
+        Vue.component('my-cmp2', {
+            template: `<div>3</div>`,
+            created() {
+                console.log(this.$parent.$parent.share);
+            }
+        })
+```
+
+
 
 这样做，很快组件就会失控：触达父级组件会使应用更难调试和理解，尤其是当变更父组件数据时，过一段时间后，很难找出变更是从哪里发起的。
 
@@ -4438,7 +4517,7 @@ var share = this.$parent.share || this.$parent.$parent.share;
 
 ### 依赖注入
 在上面的例子中，利用 $parent 属性，没有办法很好的扩展到更深层级的嵌套组件上。这也是依赖注入的用武之地，它用到了两个新的实例选项：provide 和 inject。
-
+这两个实例方法不能在vm = new Vue(...)里使用。只能在组件中使用。
 provide 选项允许我们指定想要提供给后代组件的数据/方法，例如:
 
 ```js
@@ -4465,8 +4544,36 @@ Vue.component('cmp-a', {
   template: `<div>cmp-a</div>`
 })
 ```
+举例：provide inject的使用
+```js
+        Vue.component('my-cmp', {
+            provide() {
+                return {
+                    share: this.share
+                }
+            },
+            data() {
+                return {
+                    share: 'share'
+                }
+            },
+            template: `<div>1<slot></slot></div>`,
+            created() {
+                console.log(this.share);
+            }
+        })
+        Vue.component('my-cmp1', {
+            template: `<div>2<slot></slot></div>`,
+            inject: ['share'],
+            created() {
+                console.log(this.share);
+            }
+        })
 
-相比 $parent 来说，这个用法可以让我们在任意后代组件中访问share，而不需要暴露整个 cmp-parent 实例。这允许我们更好的持续研发该组件，而不需要担心我们可能会改变/移除一些子组件依赖的东西。同时这些组件之间的接口是始终明确定义的，就和 props 一样。
+```
+
+相比 $parent 来说，这个用法可以让我们在任意后代组件中访问share，而不需要暴露整个 cmp-parent 实例。这允许我们更好的持续研发该组件，而不需要担心我们可能会改变/移除一些子组件依赖的东西。同时这些组件之间的接口是始终明确定义的，就和 props 一样。            
+
 
 实际上，你可以把依赖注入看作一部分“大范围有效的 prop”，除了：
 - 祖先组件不需要知道哪些后代组件使用它提供的属性
@@ -4482,11 +4589,49 @@ Vue.component('cmp-a', {
 ```
 
 这样就可以通过this.$refs.cmp 来访问``<my-cmp>``实例。
+
+注意：
+ 1.在vm(Vue实例)中可以看所有内部组件的this.$refs.xxx，组件只能看自己内部的this.$refs.xxx
+ 2.如果把 ref='xxx'写在了父组件的子组件中，父组件需要加``<slot></slot>``
 ref 也可以 对指定DOM元素进行访问，如:
 ```html
 <input ref="input" />
 ```
 那么，我们可以通过 this.$refs.input 来访问到该DOM元素。
+举例：$this.$refs.xxx的使用
+```html
+<div id="app">
+        <my-cmp ref="cmp">
+            <my-cmp1 ref="cmp1"></my-cmp1>
+        </my-cmp>
+        <input v-for="item in 3" ref="input" />
+</div>
+```
+```js
+        Vue.component('my-cmp', {
+            data() {
+                return {
+                    share: 'share'
+                }
+            },
+            //如果不加slot 父组件中的cmp1则不会被访问到
+            template: `<div class="one"><slot></slot></div>`,
+
+        })
+        Vue.component('my-cmp1', {
+            template: `<div class="two"></div>`
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                name: 'mao~'
+            },
+            mounted() {
+                console.log(this.$refs.input);
+                console.log(this.$refs.cmp1);
+            }
+        })
+````
 
 当ref 和 v-for 一起使用时，得到的引用将会是一个包含了对应数据源的这些子组件的数组。
 
@@ -4693,26 +4838,144 @@ Vue.component('terms-of-service', {
 
 # 组件_通信
 
-## prop 
+## props (推荐)
 父组件传递数据给子组件时，可以通过特性传递。
-
 推荐使用这种方式进行父->子通信。
+举例：
+```html
+ <prop-cmp :ceshi="father"></prop-cmp>
+```
+```js
+//props 父组件传递数据给子组件 推荐
+        Vue.component('prop-cmp', {
+            props: ['ceshi'],
+            template: `
+                <div>测试prop{{ceshi}}</div>
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                father: '父组件'
+            }
+        });
+```
 
-## $emit
+## $emit（推荐）
 子组件传递数据给父组件时，触发事件，从而抛出数据。
 
 推荐使用这种方式进行子->父通信。
+举例：
+```html
+<emit-cmp @ent="myEvent"></emit-cmp>
+```
+```js
+        Vue.component('emit-cmp', {
+            template: `
+                <button @click="$emit('ent','emit')">emit</button>
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            methods: {
+                myEvent(child) {
+                    console.log(child);
+                }
+            }
+        });
+```
 
-### v-model
+### v-model 双向绑定
 
-### .sync
+举例：
+我们可以在后台使用vm.ztext = 'xxx'给input框赋值，也可以通过vm.ztext查询input框里的值
 
-## $attrs
+```html
+<model-cmp v-model="ztext"></model-cmp>
+```
+```js
+        Vue.component('model-cmp', {
+            //props 里必须有value
+            props: ['value'],
+            template: `
+                <input :value="value" @input="$emit('input',$event.target.value)" />
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                //model
+                ztext: ''
+            }
+        });
+```
+
+
+### .sync 实现双向绑定
+
+举例：
+我们可以在后台使用vm.stext = 'xxx'给input框赋值，也可以通过vm.stext查询input框里的值
+
+```html
+<sync-cmp :value.sync="stext"></sync-cmp>
+```
+```js
+        //sync 一般用于input
+        Vue.component('sync-cmp', {
+            props: ['value'],
+            template: `
+                <input :value='value' @input="$emit('update:value',$event.target.value)" />
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                //sync
+                stext: '',
+            }
+        });
+```
+
+
+
+## $attrs 不推荐
 祖先组件传递数据给子孙组件时，可以利用$attrs传递。
 
 demo或小型项目可以使用$attrs进行数据传递，中大型项目不推荐，数据流会变的难于理解。
 
 $attrs的真正目的是撰写基础组件，将非Prop特性赋予某些DOM元素。
+
+举例：$attr 祖先组件传递数据给子孙组件
+```html
+  <attrs-cmp :inputvalue="fuvalue"></attrs-cmp>
+```
+```js
+        //attrs 祖先组件传递数据给子孙组件
+        Vue.component('attrs-cmp', {
+            //``inheritAttrs: false`` 和 ``$attrs`` 相互配合,可用于单选框
+            props: ['label', 'value'],
+            mounted() {
+                console.log(this.$attrs);
+            },
+            template: `
+                <label>
+                    {{ label }}
+                    <input
+                        v-bind:value="$attrs['inputvalue']"
+                        v-on:input="$emit('input', $event.target.value)"
+                    >
+                </label>
+            `,
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                //$attrs
+                fuvalue: '测试attrs',
+            }
+        });
+```
+
 
 ## $listeners
 可以在子孙组件中执行祖先组件的函数，从而实现数据传递。
@@ -4720,66 +4983,219 @@ $attrs的真正目的是撰写基础组件，将非Prop特性赋予某些DOM元�
 demo或小型项目可以使用$listeners进行数据传递，中大型项目不推荐，数据流会变的难于理解。
 
 $listeners的真正目的是将所有的事件监听器指向这个组件的某个特定的子元素。
+一般用于``<label><input /></label>``
+
+举例：$listeners的应用
+```html
+  <listeners-cmp @focus="onfocus" @blur="onblur"></listeners-cmp>
+```
+```js
+        //$listeners 
+        Vue.component('listeners-cmp', {
+            mounted() {
+                console.log(this.$listeners);
+            },
+            template: `
+                <label><input v-on="$listeners" /></label>
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            methods: {
+                //测试 $listeners
+                onfocus() {
+                    console.log('focus');
+                },
+                onblur() {
+                    console.log('blur');
+                }
+            }
+        });
+```
+
 
 ## $root
 可以在子组件中访问**根**实例的数据。
 
 对于 demo 或非常小型的有少量组件的应用来说这是很方便的。中大型项目不适用。会使应用难于调试和理解。
 
+举例：$root的使用
+```html
+<root-cmp></root-cmp>
+```
+```js
+        //$root 不推荐
+        Vue.component('root-cmp', {
+            created() {
+                console.log(this.$root.name);
+            },
+            template: `<div>测试root</div>`
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                //$root
+                name: '测试$root',
+            },
+            created() {
+                console.log(this.$root.name);
+            }
+        });
+```
+
+
 ## $parent
 可以在子组件中访问**父**实例的数据。
 
 对于 demo 或非常小型的有少量组件的应用来说这是很方便的。中大型项目不适用。会使应用难于调试和理解。
+
+举例：$parent的使用
+```html
+<parent-cmp></parent-cmp>
+```
+```js
+        //$parent 不推荐
+        Vue.component('parent-cmp', {
+            mounted() {
+                //获取父组件中parentname的值
+                console.log(this.$parent.parentname);
+            },
+            template: `<div>测试parent</div>`
+        })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                //$parent
+                parentname: '测试$parent',
+            }
+        });
+```
 
 ## $children
 可以在父组件中访问**子**实例的数据。
 
 对于 demo 或非常小型的有少量组件的应用来说这是很方便的。中大型项目不适用。会使应用难于调试和理解。
 
+举例：$children的使用
+```html
+<!-- $children 不推荐 -->
+<children-cmp></children-cmp>
+```
+```js
+        Vue.component('children-cmp', {
+            data() {
+                return {
+                    name: '我是子数据'
+                }
+            },
+            template: `
+             <div>测试children</div>
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            mounted() {
+                console.log(this.$children[0].name);
+            }
+        });
+```
+
 ## ref
 可以在父组件中访问**子**实例的数据。
 
 $refs 只会在组件渲染完成之后生效，并且它们不是响应式的，适用于demo或小型项目。
+举例：$refs的应用
+```html
+<ref-cmp ref="refCmp"></ref-cmp>
+```
+```js
+        Vue.component('ref-cmp', {
+            template: `
+                <div>测试ref</div>
+            `
+        })
+        const vm = new Vue({
+            el: '#app',
+            mounted() {
+                //获取$refs.refCmp
+                console.log(this.$refs.refCmp);
+            }
+        });
+```
 
 ## provide & inject
 祖先组件提供数据（provide），子孙组件按需注入（inject）。
-
+vm = new Vue(...)里使用不了。
 会将组件的阻止方式，耦合在一起，从而使组件重构困难，难以维护。不推荐在中大型项目中使用，适用于一些小组件的编写。
 
-## eventBus(事件总线)
-```js
-Vue.prototype.$bus = new Vue();
+举例： provide & inject的使用
+```html
+<pi-cmp>
+    <zpi-cmp></zpi-cmp>
+</pi-cmp>
 ```
 ```js
-Vue.component('cmp-a', {
-  data () {
-    return {
-      a: 'a'
-    }
-  },
-  methods: {
-    onClick () {
-      this.$bus.$on('click', this.a)
-    }
-  },
-  template: `
-    <div>
-      <button @click="onClick">点击</button>
-    </div>
-  `,
-})
+        //provide && inject
+        Vue.component('pi-cmp', {
+            //需要加slot
+            template: `
+                <div>测试provide和inject<slot></slot></div>
+            `,
+            //提供数据
+            provide() {
+                return {
+                    share: '数据'
+                }
+            }
+        })
+        Vue.component('zpi-cmp', {
+            template: `<div></div>`,
+            //接收数据
+            inject: ['share'],
+            mounted() {
+                console.log(this.share);
+            }
+        })
 ```
+
+
+## eventBus(事件总线) 兄弟组件中传输数据 不推荐
+
+举例：eventBus应用
 ```js
-Vue.component('cmp-a', {
-  mounted () {
-    this.$bus.$on('click', data => {
-      console.log(data);
-    })
-  },
-  template: `
-    <div>b</div>
-  `,
-})
+        //使用 eventBus(事件总线) 兄弟组件中传输数据
+        Vue.prototype.$bus = new Vue();
+        Vue.component('jj-cmp', {
+            data() {
+                return {
+                    a: '姐姐数据'
+                }
+            },
+            template: `
+                <button @click="onClick">测试eventBus(事件总线)</button>
+            `,
+            methods: {
+                onClick() {
+                    //提供数据
+                    this.$bus.$emit('bus', this.a);
+                }
+            }
+        })
+        Vue.component('mm-cmp', {
+            data() {
+                return {
+                    mm: ''
+                }
+            },
+            template: `<div>{{mm}}</div>`,
+            mounted() {
+                this.$bus.$on('bus', data => {
+                    //接收使用数据
+                    console.log(data);
+                    this.mm = data;
+                })
+            }
+        })
 ```
 非父子组件通信时，可以使用这种方法，但仅针对于小型项目。中大型项目使用时，会造成代码混乱不易维护。
 
