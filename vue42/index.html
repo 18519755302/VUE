@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组件混入</title>
+    <script src="../vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <cmp1></cmp1>
+        <cmp2></cmp2>
+    </div>
+    <script>
+        //全局混入
+        Vue.mixin({
+            created() {
+                console.log('我是全局组件，都要执行我');
+                //this.$options 组件选项
+                if (this.$options.xxx) {
+                    console.log('只有 有xxx配件的才能执行我');
+                }
+            }
+        });
+        let mixin = {
+            data() {
+                return {
+                    //如果组件中有同名的用组件的
+                    a: '我是被混入了'
+                }
+            },
+            mounted() {
+                //如果组件中也有mounted方法，都会被执行
+                console.log('我是被混入的方法');
+            },
+            methods: {
+                fn() {
+                    //如果组件中有同名方法，用组件中方法
+                    console.log('我是被混入的method方法');
+                }
+            }
+        };
+        Vue.component('cmp2', {
+            mixins: [mixin],
+            xxx: '我因为全局混入被执行了',
+            created() {
+                console.log(this.a);
+            },
+            beforeMount() {
+                this.fn();
+            },
+            mounted() {
+                console.log('我是组件内方法');
+            },
+            data() {
+                return {
+                    a: '我执行了，混入的就不执行了'
+                }
+            },
+            methods: {
+                fn() {
+                    console.log('我是组件内methods方法');
+                }
+            },
+            template: `
+                <div>cmp2</div>
+            `
+        })
+        Vue.component('cmp1', {
+            mixins: [mixin],
+            created() {
+                console.log(this.a);
+            },
+            template: `
+                <div>cmp1</div>
+            `
+        })
+        const vm = new Vue({
+            el: '#app'
+        })
+    </script>
+</body>
+
+</html>

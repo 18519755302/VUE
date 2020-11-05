@@ -5203,6 +5203,79 @@ vm = new Vue(...)里使用不了。
 状态管理，中大型项目时强烈推荐使用此种方式，日后再学~
 
 # 混入
+
+举例：混入的使用
+```js
+        //全局混入
+        Vue.mixin({
+            created() {
+                console.log('我是全局组件，都要执行我');
+                //this.$options 组件选项
+                if (this.$options.xxx) {
+                    console.log('只有 有xxx配件的才能执行我');
+                }
+            }
+        });
+        let mixin = {
+            data() {
+                return {
+                    //如果组件中有同名的用组件的
+                    a: '我是被混入了'
+                }
+            },
+            mounted() {
+                //如果组件中也有mounted方法，都会被执行
+                console.log('我是被混入的方法');
+            },
+            methods: {
+                fn() {
+                    //如果组件中有同名方法，用组件中方法
+                    console.log('我是被混入的method方法');
+                }
+            }
+        };
+        Vue.component('cmp2', {
+            mixins: [mixin],
+            xxx: '我因为全局混入被执行了',
+            created() {
+                console.log(this.a);
+            },
+            beforeMount() {
+                this.fn();
+            },
+            mounted() {
+                console.log('我是组件内方法');
+            },
+            data() {
+                return {
+                    a: '我执行了，混入的就不执行了'
+                }
+            },
+            methods: {
+                fn() {
+                    console.log('我是组件内methods方法');
+                }
+            },
+            template: `
+                <div>cmp2</div>
+            `
+        })
+        Vue.component('cmp1', {
+            mixins: [mixin],
+            created() {
+                console.log(this.a);
+            },
+            template: `
+                <div>cmp1</div>
+            `
+        })
+        const vm = new Vue({
+            el: '#app'
+        })
+```
+
+
+
 ## 基础
 混入 (mixin) 提供了一种非常灵活的方式，来分发 Vue 组件中的可复用功能。
 一个混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
@@ -5251,7 +5324,7 @@ new Vue({
 ```
 
 合并钩子函数，将合并为一个数组。先调用混入对象的钩子，再调用组件自身钩子。
-
+就是如果钩子函数相同，则会混入的和组件的钩子函数都只执行。
 ```js
 var mixin = {
   created () {
@@ -5268,9 +5341,9 @@ new Vue({
 })
 ```
 
-合并值为对象的选项，如 methods、components 等，将被合并为同一个对象。两个对象键名冲突时，取组件对象的键值对。
+合并值为对象的选项，如 methods、components 等，将被合并为同一个对象。两个对象键名冲突时，取组件对象的键值对（就是比如methods中方法名一样时，会执行组件的方法）。
 
-## 全局混入
+## 全局混入(谨慎使用)
 混入也可以进行全局注册。使用时格外小心！一旦使用全局混入，它将影响每一个之后创建的 Vue 实例。使用恰当时，这可以用来为自定义选项注入处理逻辑。
 ```js
 // 为自定义的选项 'myOption' 注入一个处理器。
