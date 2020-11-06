@@ -5205,6 +5205,12 @@ vm = new Vue(...)里使用不了。
 # 混入
 
 举例：混入的使用
+```html
+<div id="app">
+    <cmp-1></cmp-1>
+    <cmp-2></cmp-2>
+</div>
+```
 ```js
         //全局混入
         Vue.mixin({
@@ -5410,13 +5416,57 @@ Vue.directive('focus', {
 被绑定元素插入父节点时调用(仅保证父节点存在，但不一定已被插入文档中)。
 
 ### update
-所在组件的 VNode 更新时调用，**但是可能发生在其子 VNode 更新之前**。
+所在组件的 VNode 更新时(页面更新时)调用，**但是可能发生在其子 VNode 更新之前**。
 
 ### componentUpdated
-指令所在组件的 VNode **及其子 VNode** 全部更新后调用。
+所在组件的 VNode 更新时(页面更新时)调用，指令所在组件的 VNode **及其子 VNode** 全部更新后调用。
 
 ### unbind
 只调用一次，指令与元素解绑时调用(被绑定的Dom元素被Vue移除)。
+
+举例：五种钩子方法使用
+```html
+<div id="app">
+
+        <input type="text" v-focus:[num].number='test' v-if='is' />
+</div>
+```
+```js
+        //binding中arg(参数)为3 modifiers(修饰符)为.number
+        Vue.directive('focus', {
+            //只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+            bind(el, binding) {
+                console.log('bind', el, binding);
+            },
+            //被绑定元素插入父节点时调用
+            inserted(el, binding) {
+                console.log('insert', el, binding);
+            },
+            //所在组件的 VNode 更新时(页面更新时)调用，但是可能发生在其子 VNode 更新之前。
+            update(el, binding, vnode,oldVnode) {
+                console.log('update', el, binding, vnode,oldVnode);
+            },
+            //所在组件的 VNode 更新时(页面更新时)调用，发生在其子 VNode 更新之后。
+            componentUpdated(el, binding, vnode,oldVnode) {
+                console.log('componentUpdated', el, binding, vnode,oldVnode);
+            },
+            //只调用一次，指令与元素解绑时调用(被绑定的Dom元素被Vue移除)
+            //可用v-if尝试
+            unbind(el, binding, vnode) {
+                console.log('unbind', el, binding, vnode);
+            }
+        })
+        const vm = new Vue({
+            el: "#app",
+            data: {
+                test: '123',
+                //测试钩子方法unbind
+                is: true,
+                //slice参数
+                num:3
+            }
+        })
+```
 
 ## 钩子函数参数
 - el: 指令所绑定的元素，可以用来直接操作DOM。
@@ -5427,7 +5477,7 @@ Vue.directive('focus', {
   - expression：字符串形式的指令表达式。例如 v-my-directive="1 + 1" 中，表达式为 "1 + 1"。
   - arg：传给指令的参数，可选。例如 v-my-directive:foo 中，参数为 "foo"。
   - modifiers：一个包含修饰符的对象。例如：v-my-directive.foo.bar 中，修饰符对象为 { foo: true, bar: true }。
-- vnode：Vue 编译生成的虚拟节点。
+- vnode：Vue 编译生成的虚拟节点。vnode.context 为vm (vm= new Vue())
 - oldVnode：上一个虚拟节点，仅在 update 和 componentUpdated 钩子中可用。
 
 ## 练习
