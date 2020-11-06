@@ -5681,10 +5681,23 @@ Vue.filter('filter', value => {})
 ```
 
 局部过滤器：
+```html
+<div id="app">{{ content | myfilter(0.5) }}</div>
+```
 ```js
-filter () {
-  return xxx;
-}
+        const vm = new Vue({
+            el: "#app",
+            data: {
+                content: '我是测试过滤器的'
+            },
+            filters: {
+                //过滤器
+                myfilter(val, param) {
+                    console.log(val, param);
+                    return '我是内部的，比全局更先执行'
+                }
+            }
+        })
 ```
 
 ## 参数
@@ -5693,11 +5706,29 @@ filter () {
 当过滤器形式为 `` msg | filter('a') ``时，filter过滤器接收两个参数，参数为``msg, 'a'``
 
 ## 过滤器串联
-```js
-{{ msg | filterA | filterB }}
+```html
+    <div id="app">{{ content | myfilter(0.5) | myfilter1 }}</div>
 ``` 
-在这个例子中，filterA的参数为``msg``，filterB的参数为filterA。
-
+在这个例子中，myfilter的参数为``content``，myfilter1的参数为myfilter。
+```js
+        const vm = new Vue({
+            el: "#app",
+            data: {
+                content: '我是测试过滤器的'
+            },
+            filters: {
+                //过滤器 串联 myfilter myfilter1
+                myfilter(val, param) {
+                    console.log(val, param);
+                    return '我是内部的，比全局更先执行'
+                },
+                myfilter1(val) {
+                    console.log(val);
+                    return '过滤器串联，我只看我前面的值'
+                }
+            }
+        })
+```
 ## 练习
 ### 首字母大写
 ```html
