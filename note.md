@@ -4909,8 +4909,109 @@ Vue.component('terms-of-service', {
             }
         });
 ```
-
-
+注意：
+关于v-model执行方法，可在被调用子组件中添加选项
+```js
+ model: {
+    //model 为 v-model使用
+    //变量名
+    prop: "dateP",
+    //事件名 自己定义事件名
+    event: "date-choose",
+  },
+```
+举例：v-model自定义事件和变量的使用
+父组件
+```html
+<data-picker v-model="dateP"></data-picker>
+```
+```js
+import datePicker from "./DatePicker.vue";
+export default {
+  components: {
+    DataPicker: datePicker,
+  },
+  data() {
+    return {
+      //这时 dateP为传给子组件的值
+      dateP: new Date(),
+    };
+  }
+};
+```
+子组件
+```js
+export default {
+  props: {
+    //这个dateP就是父组件传来的值
+    dateP: {
+      type: Date,
+      //默认值为数据或对象时 用函数返回
+      //default: () => new Date(),
+    },
+  },
+  model: {
+    //model 为 v-model使用 
+    //变量名
+    prop: "dateP",
+    //事件名 自己定义事件名
+    event: "date-choose",
+  },
+  methods: {
+    //选择日期
+    changeDate(date) {
+      //输入框 赋值 调用主组件方法
+      this.$emit("date-choose", date);
+    },
+  },
+};
+```
+举例：v-model自定义事件和变量的使用，不用v-model实现
+父组件
+```html
+<!-- :dateP 为子组件定义的值  后面的dateP为父组件定义的值-->
+ <data-picker :dateP="dateP" @date-choose="changeValue"></data-picker>
+```
+```js
+import datePicker from "./DatePicker.vue";
+export default {
+  components: {
+    DataPicker: datePicker,
+  },
+  data() {
+    return {
+      //给:dateP=dateP中后面的dateP赋值
+      dateP: new Date(),
+    };
+  },
+  methods: {
+    //不用v-model时 datePicker会调用 给输入框赋值
+    changeValue(date) {
+      this.dateP = date;
+    },
+  },
+};
+```
+子组件
+```js
+export default {
+  props: {
+    //这个dateP就是父组件传来的值
+    dateP: {
+      type: Date,
+      //默认值为数据或对象时 用函数返回
+      //default: () => new Date(),
+    },
+  },
+  methods: {
+    //选择日期
+    changeDate(date) {
+      //输入框 赋值 调用主组件方法
+      this.$emit("date-choose", date);
+    },
+  },
+};
+```
 ### .sync 实现双向绑定
 
 举例：
@@ -5798,6 +5899,59 @@ npm install -g @vue/cli-service-global
 # OR
 yarn global add @vue/cli-service-global
 ```
+## 组件结构
+启动组件：进入App.vue父级文件夹终端，输入vue serve,这时，就会启动，终端会给出访问地址，这个地址就是我们访问App.vue的地址，其他vue模块可以往App.vue里面加，如果想访问其他.vue文件那么在终端舒服vue serve xxx.vue
+
+举例：App.vue
+```vue
+<template>
+  <div>
+    {{ content }}
+    <base-son />
+  </div>
+</template>
+<script>
+import son from "./Son";
+export default {
+  components: {
+    baseSon: son,
+  },
+  data() {
+    return {
+      content: "我是妹妹",
+    };
+  },
+};
+</script>
+<style>
+div {
+  background-color: azure;
+}
+</style>
+```
+我们可能会在son.vue中定义样式，如果想样式仅在Son.vue中使用，需要在style中加入scoped``<style scoped>``,如果不加，引用Son.vue相当于在全局加了Son.vue的样式
+
+Son.vue
+```vue
+<template>
+  <div>
+    son
+    <p>hahaah is a p</p>
+  </div>
+</template>
+
+<style scoped>
+p {
+  background-color: green;
+}
+</style>
+```
+
+
+组件中
+用``<template>...</template>``放入html
+用``<script>...</script>``放入js
+用``<style></style>``放入样式
 
 ## 安装vscode插件
 名字：Vetur。用于高亮.vue文件代码
