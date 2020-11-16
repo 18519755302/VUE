@@ -6022,7 +6022,7 @@ data: [
 
 # 利用脚手架搭建项目
 
-有两种方式搭建项目
+有两种方式搭建项目(我们用的是运行时版，体积比完整版少了30%)
 （不推荐）第一种终端进入要搭建项目文件夹，输入vue ui进入图形化项目搭建页面，搭建项目。
 （推荐）第二种终端进入要搭建项目文件夹，在终端内直接建立项目。
  第二种方法步骤：
@@ -6035,7 +6035,7 @@ data: [
      node_modules :项目依赖包文件
      public：默认的打开的html文件就在这，在这个html文件中我们会注入js，js文件(main.js)在src文件夹中。
      src: 
-        1.main.js主入口文件，其中有句render: h => h(App)是将   嵌入   到对应有id="app"的html文件中。
+        1.main.js主入口文件，其中有句render: h => h(App)是将 vue嵌入到对应的html文件中。
         2.App.vue组件中入口
         3.assets文件夹放置css文件图片文件等静态文件
         4.components文件放置组件
@@ -6077,6 +6077,7 @@ render: function (createElement) {
   )
 },
 ```
+render函数的优先级：在new Vue中的template选项 < render < 在.vue实例中的写结构用的template
 
 ## 节点、树、以及虚拟DOM
 在深入渲染函数之前，先来了解一些浏览器的工作原理。例如，下面这段HTML：
@@ -6118,8 +6119,10 @@ createElement接收的参数：
 ```js
 createElement(标签名(必需), 与模板中属性对应的数据对象(可选), 子级虚拟节点(可选));
 ```
-
-### 深入数据对象
+标签名：html标签或组件
+与模板中属性对应的数据对象：描述对象使用，比如class是什么，id是什么，还可以是html标签数组,或是字符串，是字符串时就是内部的内容就是个文本节点
+子级虚拟节点：字符串或数组，如果是字符串，就证明子级是个文本节点。
+### 深入 ‘与模板中属性对应的数据对象’
 ```js
 {
   // 与 `v-bind:class` 的 API 相同，接受一个字符串、对象或字符串和对象组成的数组
@@ -6134,12 +6137,13 @@ createElement(标签名(必需), 与模板中属性对应的数据对象(可选)
   },
   // 普通的 HTML attribute
   attrs: {
-    id: 'foo',
+    id: 'foo',//给组件赋id='foo'
   },
-  // 组件 prop
+  // 组件 prop （父级传来的变量）
   props: {
     myProp: 'bar',
   },
+  //特性和属性：特性是写在行间的，属性是通过dom元素点出来的那些值
   // DOM属性
   domProps: {
     innerHTML: 'baz',
@@ -6152,22 +6156,35 @@ createElement(标签名(必需), 与模板中属性对应的数据对象(可选)
   nativeOn: {
     click: this.nativeClickHandler
   },
-  // 自定义指令。注意，无法对 `binding` 中的 `oldValue`赋值，因为 Vue 已经自动为你进行了同步。
+  // 使用自定义指令。注意，无法对 `binding` 中的 `oldValue`赋值，因为 Vue 已经自动为你进行了同步。
   directives: [
     {
       name: 'my-custom-directive',
-      value: '2',
-      expression: '1 + 1',
-      arg: 'foo',
+      value: '2',//或是this.xxx
+      expression: '1 + 1',//表达式的值
+      arg: 'foo',//自定义指令的参数 比如 v-slice:5 中的5
       modifiers: {
         bar: true
       }
     }
   ],
+  //使用自定义指令举例 <input v-slice:5.number="content" />
+  //  directives: [
+  //     {
+  //       name: 'slice',  // v-slice
+  //       value: this.content, // v-slice="content"
+  //       expression: 'content',
+  //       arg: 5, // v-slice:5="content"
+  //       modifiers: {
+  //         number: true // v-slice:5.number="content"
+  //       },
+  //     }
+  // ]
+
   // 其它特殊顶层属性
   key: 'myKey',
   ref: 'myRef',
-  // 如果在渲染函数中给多个元素都应用了相同的 ref 名，那么 `$refs.myRef` 会变成一个数组。
+  // 如果在渲染函数中给多个元素都应用了相同的 ref 名，那么 `$refs.myRef` 会变成一个数组。(就是说想让$refs.myRef的值变为数组，refInFor的值就得为true)
   refInFor: true
   // 作用域插槽，格式为：{ name: props => VNode | Array<VNode> }
   // 如果组件是其它组件的子组件，需为插槽指定名称
@@ -6202,9 +6219,6 @@ render (createElement) {
 
 ### v-model
 渲染函数中没有与v-model的直接对应---必须自己实现相应的逻辑：
-```html
-<input v-model="value" />
-```
 
 ```js
 data () {

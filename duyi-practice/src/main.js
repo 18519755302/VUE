@@ -1,10 +1,16 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-//生产模式是否需要警告提示
 Vue.config.productionTip = false
 
+// 模板
+// el $mount
+// template el.outerHTML 
+
+// 完整版
+// 运行时版  （少了编译器，体积小30%，）
+
 new Vue({
-  //这句是将 vue嵌入到对应有id="app"的html文件中
+  // template: '<p>haah deng is a p</p>',
   render: h => h(App),
 }).$mount('#app')
