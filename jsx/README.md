@@ -1,4 +1,4 @@
-# duyi-practice
+# jsx
 
 ## Project setup
 ```

@@ -3990,7 +3990,7 @@ Vue.component('z-sync', {
 和 HTML 元素一样，我们经常需要向一个组件传递内容，像这样：
 ```html
 <my-cmp>
-  Something bad happened.
+  Something bad happened.  
 </my-cmp>
 ```
 如果有这样的需求，我们就可以通过插槽来做。
@@ -6077,7 +6077,7 @@ render: function (createElement) {
   )
 },
 ```
-render函数的优先级：在new Vue中的template选项 < render < 在.vue实例中的写结构用的template
+render函数的优先级：在new Vue中的template选项 < render < 在.vue实例中的写结构用的``<template></template>``
 
 ## 节点、树、以及虚拟DOM
 在深入渲染函数之前，先来了解一些浏览器的工作原理。例如，下面这段HTML：
@@ -6327,8 +6327,8 @@ render: function (createElement) {
 }
 ```
 
-# JSX 
-在Vue中使用JSX语法。可以让我们回到更接近模板的语法上。
+# JSX (JS + XML(html) == JSX)
+为了让render函数更好理解，所以在Vue中使用JSX语法。可以让我们回到更接近模板的语法上。
 ```js
 render () {
   return (
@@ -6338,59 +6338,217 @@ render () {
 ```
 
 ## 插值
+在JSX中我们一般用<>去括html，用{}去括js
 ```js
 <div>{ this.value }</div>
+```
+举例：
+```js
+export default {
+  name: "App",
+  data() {
+    return { value: "hello world" };
+  },
+  components: {
+    HelloWorld,
+  },
+  render() {
+    return <h1>{this.value}</h1>;
+  },
+};
 ```
 
 ## 指令
 在JSX中，一些指令并不存在，所以我们可以换一种方式来处理。
 
 ### v-text
-```html
-<div domPropsTextContent="<p>i am a p</p>"></div>
-```
+就是在domProps前缀加上想改变的内容 ，比如domPropsTextContent 是改变文案内容的，但是这个在有些版本不好使
 
+```js
+export default {
+  name: "App",
+  render() {
+    return (
+      <h1>
+        <div domPropsTextContent="<p>i am a p</p>"></div>
+      </h1>
+    );
+  },
+};
+```
+结果：打印出  ``<p>i am a p</p>``
 ### v-html
-```html
-<div domPropsInnerHTML="<p>i am a p</p>"></div>
-```
+就是在domProps前缀加上想改变的内容 ，比如domPropsInnerHTML 是改变innerHTML的，但是这个在有些版本不好使
 
-### v-show
-jsx支持v-show指令：
-```html
-<div v-show={this.show}></div>
+```js
+export default {
+  name: "App",
+  data() {
+    return { value: "hello world" };
+  },
+  render() {
+    return (
+      <h1>
+        <div domPropsInnerHTML="<a>href</a>"></div>
+      </h1>
+    );
+  },
+};
 ```
+### v-show(控制是否显示)
+jsx支持v-show指令：显示：true 不显示false
 
+```js
+export default {
+  name: "App",
+  data() {
+    return { show: false };
+  },
+  render() {
+    return (
+      <h1>
+        <div v-show={this.show}>我是v-show</div>
+      </h1>
+    );
+  },
+};
+```
 ### v-if 
+jsx中不支持v-if，v-if....else....，所以我们要想使用需要自己模拟,
+但是v-if...else if...else...这种类型没法用简单的语句来模拟，需要通过函数
 ```html
-<!-- v-if -->
+<!-- 模拟v-if 显示或不显示有前面的true/false决定 -->
 {true && <div>div</div>}
+<!-- 模拟v-if ...else .... 显示或不显示有前面的true/false决定 -->
 {true ? <div>div</div> : <span>span</span>}
 ```
-
+```js
+export default {
+  name: "App",
+  data() {
+    return {
+      //控制if
+      num: 2,
+    };
+  },
+  methods: {
+    //模拟v-if ..else if... else...
+    vif() {
+      if (this.num === 1) {
+        return "<div>if</div>";
+      } else if (this.num === 2) {
+        return "<div> else if</div>";
+      } else {
+        return "<div> else</div>";
+      }
+    },
+  },
+  render() {
+    return (
+      <h1>
+        v-if  {false && <div>v-if</div>}
+        v-if.. else ..{true ? <div>v-if</div> : <div>else</div>}
+        v-if.. else if ..else..{this.vif()}
+      </h1>
+    );
+  },
+};
+```
 ### v-for
+jsx不支持，需要模拟，且每个for 元素里需要加key，提升页面性能
 ```html
 { [1, 2, 3].map(item => (<div key={item}>{ item }</div>))}
 ```
+举例:应用
+```js
+export default {
+  name: "App",
+  render() {
+    return (
+      <h1>
+        {[1, 2, 3].map((item) => (
+          <div key={item}>{item}</div>
+        ))}
+      </h1>
+    );
+  },
+};
+```
 
 ### v-on
+就是on加上事件，要小驼峰式，比如onClick。或on-事件名（这都要求是小写），组件原生事件是nativeOn加上事件名，要小驼峰式，比如nativeOnClick
 ```html
 <button onClick={this.handleClick}>点击事件</button>
 <button on-click={this.handleClick}>点击事件</button>
-<!-- 对应@click.native -->
-<cmp-button nativeOnClick={this.handleClick}>原生点击事件</cmp-button>
+<!-- 对应@click.native 组件的原生事件-->
+<cmp-button nativeOnClick={this.handlerClick}></cmp-button>
 <!-- 传递参数 -->
 <button onClick={e => this.handleClick(this.id)}>触发点击事件时，传递参数</button>
+```
+举例：
+```js
+import CmpButton from "./components/CmpButton";
+export default {
+  name: "App",
+  components: {
+    CmpButton,
+  },
+  methods: {
+    handlerClick(num) {
+      console.log(num);
+    },
+  },
+  render() {
+    return (
+      <h1>
+        <button onClick={this.handlerClick}>onClick</button>
+        <button on-click={this.handlerClick}>on-click</button>
+        <button onClick={(e) => this.handlerClick(2)}>click传参</button>
+        <cmp-button nativeOnClick={this.handlerClick}></cmp-button>
+      </h1>
+    );
+  },
+};
+```
+CmpButton组件
+```js
+<template>
+  <div>组件</div>
+</template>
 ```
 
 ### v-bind
 ```html
 <input value={this.value} />
 ```
+应用：
+```js
+export default {
+  name: "App",
+  data() {
+    return {
+      //控制显示内容
+      content: "v-bind",
+    };
+  },
+  render() {
+    return (
+      <h1>
+        <input value={this.content} />
+        <div class={["a", "b"]} style={{ fontSize: "14px",color: "red" }}>
+          v-bind
+        </div>
+      </h1>
+    );
+  },
+};
+```
 
-在JSX中可以直接使用class="xx"来指定样式类，内联样式可以直接写成style="xxx"
+在JSX中可以直接使用class="xx"来指定样式类,内联样式可以直接写成style="xxx",以下是格式要求
+
 ```html
 <div class="a b" style="font-size: 12px;">Content</div>
+<div class={["a", "b"]}  style="font-size: 12px;">Content</div>
 <div class={{a: true, b: false}}>Content</div>
 <div style={{color: 'red', fontSize: '14px'}}>Content</div>
 ```
@@ -6401,7 +6559,25 @@ jsx支持v-show指令：
 ```html
 <input type="text" v-model={this.value} />
 ```
-
+应用：
+```js
+export default {
+  name: "App",
+  data() {
+    return {
+      //控制显示内容
+      content: "v-bind",
+    };
+  },
+  render() {
+    return (
+      <h1>
+        <input type="text" v-model={this.content} />
+      </h1>
+    );
+  },
+};
+```
 ### v-slot
 ```html
 <my-cmp>
@@ -6416,20 +6592,50 @@ jsx支持v-show指令：
 以上三个指令，不常用，无替代方案
 
 ## Ref 
+从this.$refs.xxx 中获取ref的值
 ```html
 <div ref="xxx">xxx</div>
 ```
-
+应用：
+```js
+export default {
+  name: "App",
+  render() {
+    return (
+      <h1>
+        <div ref="ourref">ref</div>
+        {[4, 5, 6].map((item) => (
+          <div ref="xx" refInFor={true} key={item}>
+            {item}
+          </div>
+        ))}
+      </h1>
+    );
+  },
+  mounted() {
+    console.log(this.$refs.ourref);
+    console.log(this.$refs.xx);
+  },
+};
+```
 当遍历元素或组件时，如：
 ```js
-[1, 2, 3].map(item => <div ref="xx" key={ item }>{ item }</div>)
+{[4, 5, 6].map((item) => (
+    <div ref="xx" key={item}>
+      {item}
+    </div>
+))}
 ```
 会发现从 this.$refs.xxx 中获取的并不是期望的数组值，此时就需要将refInFor属性设置为true了：
 ```js
-[1, 2, 3].map(item => <div ref="xx" refInFor={true} key={item}>{ item }</div>)
+{[4, 5, 6].map((item) => (
+    <div ref="xx" refInFor={true} key={item}>
+      {item}
+    </div>
+))}
 ```
 
-## 自定义指令
+## 自定义指令 (没有尝试，对错未定)
 ```js
 render () {
   // 1
@@ -6455,61 +6661,116 @@ render () {
 ## 过滤器
 ```html
 <!-- 正常使用过滤器 -->
-<div>{{ msg | capitalize }}</div>
+<div>{{ value | myfilter }}</div>
 
 <!-- 在jsx中使用过滤器 -->
-<div>{ this.$options.filters('capitalize')(this.msg)}</div>
+<div>{this.$options.filters["myfilter"](this.value)}</div>
 ```
-
+应用举例：
+```js
+export default {
+  name: "App",
+  data() {
+    return {
+      value: "111"
+    };
+  },
+  filters: {
+    //过滤器
+    myfilter(val) {
+      console.log(val);
+      return "我是内部的，比全局更先执行";
+    },
+  },
+  render() {
+    return (
+      <h1>
+        <div>{this.$options.filters["myfilter"](this.value)}</div>
+      </h1>
+    );
+  }
+};
+```
 
 ## 插槽
 模板写法：
 ```html
-<!-- 组件内 -->
-<div class="demo">
-  <slot name="header"></slot>
-  <slot></slot>
-</div>
+<!-- 子组件内 -->
+<template>
+  <div><slot name="footer"></slot></div>
+</template>
 
-<!-- 使用时 -->
-<my-cmp>
-  default
-  <template v-slot:header>header</template>
-</my-cmp>
+<!-- 父组件 使用时 -->
+<template>
+  <div>
+    <b-cop>
+      <template v-slot:header>头部</template>
+      <template v-slot:footer>
+        <p>底部</p>
+      </template>
+    </b-cop>
+  </div>
+</template> 
 ```
 
 JSX写法：
 ```html
-<!-- 组件内 -->
-<div class="demo">
-  { this.$slots.header }
-  { this.$slots.default }
-</div>
+<!-- 子组件内 -->
+export default {
+  render() {
+    return (
+      <div>
+        {this.$slots.default}
+        <p>{this.$slots.header}</p>
+      </div>
+    );
+  },
+};
 
-<!-- 使用时 -->
-<my-cmp>
-  default
-  <template slot="header">header</template>
-</my-cmp>
+<!-- 父组件 使用时 -->
+import CmpSlot from "./components/CmpSlot.vue";
+export default {
+  name: "App",
+  components: {
+    CmpSlot,
+  },
+  render() {
+    return (
+      <h1>
+        <cmp-slot>
+          default
+          <template slot="header">header</template>
+        </cmp-slot>
+      </h1>
+    );
+  }
+};
 ```
 
 作用域插槽：
 模板写法：
 ```html
-<!-- 组件内 -->
-<div class="demo">
-  <slot :text="'HelloWorld'"></slot>
-</div>
+<!-- 子组件内 -->
+<template>
+  <div>
+    1111
+    <slot :text="'HelloWorld'"></slot>
+  </div>
+</template>
 
-<!-- 使用时 -->
-<my-cmp v-slot="slotProps">
-  {{ slotProps.text }}
-</my-cmp>
+<!-- 父组件 使用时 -->
+<template>
+  <div>
+    <b-com v-slot="slotProps">
+      {{ slotProps.text }}
+    </b-com>
+  </div>
+</template> 
 ```
 
 JSX写法：
 ```html
-<!-- 组件内 -->
+<!-- 子组件内 -->
 <div class="demo">
   { 
     this.$scopedSlots.default({
@@ -6518,7 +6779,7 @@ JSX写法：
   }
 </div>
 
-<!-- 使用时 -->
+<!--父级组件 使用时 -->
 <div id="app">
   <base-demo {...{
     scopedSlots: {
@@ -6527,7 +6788,65 @@ JSX写法：
   }}></base-demo>
 </div>
 ```
+使用：父组件
+```js
+//第一种写法
+import CmpSlot from "./components/CmpSlot.vue";
+export default {
+  name: "App",
+  components: {
+    CmpSlot,
+  },
+  render() {
+    return (
+      <h1>
+        <cmp-slot
+          {...{
+            scopedSlots: {
+              default: (props) => props.text,
+            },
+          }}
+        ></cmp-slot>
+      </h1>
+    );
+  },
+};
 
+//第二种写法
+import CmpSlot from "./components/CmpSlot.vue";
+export default {
+  name: "App",
+  components: {
+    CmpSlot,
+  },
+  render() {
+    const scopedSlots = {
+      scopedSlots: {
+        default: (props) => <span>{props.text}</span>,
+      },
+    };
+    return (
+      <h1>
+        <cmp-slot {...scopedSlots}></cmp-slot>
+      </h1>
+    );
+  },
+};
+```
+子组件：
+```js
+export default {
+  render() {
+    return (
+      <div>
+        {this.$scopedSlots.default({
+          text: "~~~HelloWorld~~~~~~~",
+        })}
+      </div>
+    );
+  },
+};
+```
 # 函数式组件
 当一个组件不需要状态（即响应式数据）、不需要任何生命周期场景、只接受一些props来显示组件时，我们可以将其标记为函数式组件。
 
