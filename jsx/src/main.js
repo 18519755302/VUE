@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import App from './App.vue';
+import Bpp from './Bpp.vue';
 
 //Vue.config.productionTip = true;
 
 new Vue({
-    render: h => h(App),
+    render: h => h(Bpp),
 }).$mount('#app')

@@ -6578,13 +6578,6 @@ export default {
   },
 };
 ```
-### v-slot
-```html
-<my-cmp>
-  默认插槽
-  <div slot="a">具名插槽 a</div>
-</my-cmp>
-```
 
 ### v-pre
 ### v-cloak
@@ -6853,6 +6846,18 @@ export default {
 ```js
 functional: true,
 ```
+举例（子组件）：
+```js
+export default {
+  props: ["level"],
+  functional: true,
+  render(h, context) {
+    //context 为上下文，提供数据
+    const props = context.props;
+    const tag = "h" + props.level;
+    return <tag></tag>;
+  },
+```
 
 因为函数式组件只是函数，所以渲染开销会低很多。
 
@@ -6862,11 +6867,75 @@ functional: true,
 - props：提供所有 prop 的对象
 - slots: 一个函数，返回了包含所有插槽(非作用域)的对象
 - scopedSlots: (2.6.0+) 一个暴露传入的作用域插槽的对象。也以函数形式暴露普通插槽。
-- data：传递给组件的整个数据对象，作为 createElement 的第二个参数传入组件
+- data：传递给组件的整个数据对象，作为 createElement 的第二个参数传入组件,其中对象data.attrs中会显示prop中的数据，但是如果是props显示声明的数据就不会显示在data.attrs中，只有props隐式声明的才会显示在attrs中。
 - parent：对父组件的引用
 - listeners: (2.3.0+) 一个包含了所有父组件为当前组件注册的事件监听器的对象。这是  data.on 的一个别名。
 - injections: (2.3.0+) 如果使用了 inject 选项，则该对象包含了应当被注入的属性。
-- children: VNode 子节点的数组，包含了所有的非作用域插槽和非具名插槽。
+
+举例应用：
+```js
+//子组件
+export default {
+  //   props: ["level"],
+  functional: true,
+  //需要再次先数据，context.injections才会有值
+  inject: ["name"],
+  render(h, context) {
+    //提供所有 prop 的对象
+    const props = context.props;
+    //一个函数，返回了包含所有插槽(非作用域)的对象
+    const slot = context.slots().default;
+    //一个暴露传入的作用域插槽的对象。也以函数形式暴露普通插槽。
+    const header = context.scopedSlots.header()[0];
+    //对象data.attrs中会显示prop中的数据，
+    //但是如果是props显示声明的数据就不会显示在data.attrs中，
+    //只有props隐式声明的才会显示在attrs中
+    const levelObj = context.data.attrs;
+    //父级 组件
+    const parent = context.parent;
+    //一个包含了所有父组件为当前组件注册的事件监听器的对象,可把listeners
+    //换为data.on也可以
+    const listener = context.listeners;
+    const listener1 = context.data.on;
+    //父级的注入值 父级注入了，自己在收一下，context.injections才有值
+    const injections = context.injections;
+
+    const tag = "h" + props.level;
+    return <tag></tag>;
+  },
+};
+//父组件
+<template>
+  <level-cmp :level="2" @click="count++">
+    ok
+    <template v-slot:header>头部</template>
+  </level-cmp>
+</template>
+<script>
+import LevelCmp from "./components/LevelCmp";
+export default {
+  name: "Bpp",
+  //要先注入，子组件inject才能获取到值
+  provide() {
+    return {
+      name: "我是注入的",
+    };
+  },
+  components: {
+    LevelCmp,
+  },
+  data() {
+    return {
+      count: 0,
+      share: "我是注入的",
+    };
+  },
+};
+</script>
+```
+
+
+- children: VNode 子节点的数组，包含了所有的非作用域插槽和非具名插槽。具名为default``<template v-slot:default>头部</template>``的都不会显示
 
 ## slots() VS children
 
