@@ -1,16 +1,20 @@
 <template>
-  <div class="demo">
-    <button @click="show = !show">click</button>
-    <!-- transition-group 包裹多元素过渡 -->
-    <transition-group>
-      <div key="world" v-if="show">hello wrold</div>
-      <div key="shanshan" v-if="show">hello shanshan</div>
-    </transition-group>
+  <div>
+    <button @click="show = !show">点我</button>
+    <fu-yong>
+      <div v-if="show">hello world</div>
+    </fu-yong>
   </div>
 </template>
-
 <script>
+//组件  过渡复用
+//import FuYong from "./FuYong";
+//函数式组件 过渡复用
+//import FuYong from "./FuyongHanshu";
 export default {
+  components: {
+    FuYong,
+  },
   data() {
     return {
       show: true,
@@ -18,20 +22,8 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-.v-enter,
-.v-leave-to {
-  opacity: 0;
-}
-
-.v-enter-active,
-.v-leave-active {
-  transition: all 0.3s;
-}
-
-.v-leave,
-.v-enter-to {
-  opacity: 1;
+button {
+  margin-bottom: 30px;
 }
 </style>
