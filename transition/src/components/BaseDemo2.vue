@@ -1,38 +1,81 @@
 <template>
-  <div>
-    <button @click="handle()">click</button>
-    <!-- 多个div 过渡 -->
-    <transition>
-      <div :key="keyName">hello {{ keyName }}</div>
-    </transition>
+  <div class="demo">
+    <button @click="handleAdd">添加</button>
+    <button @click="handleRemove">移除</button>
+    <button @click="handleShuffle">洗牌</button>
+
+    <br />
+    <transition-group tag="ul">
+      <li v-for="item in lists" :key="item">{{ item }}</li>
+    </transition-group>
   </div>
 </template>
+
 <script>
 export default {
   data() {
-    return { keyName: "world" };
+    return {
+      lists: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      nextNum: 11,
+    };
   },
   methods: {
-    handle() {
-      this.keyName = this.keyName === "world" ? "shanshan" : "world";
+    handleAdd() {
+      const index = Math.floor(Math.random() * this.lists.length);
+      this.lists.splice(index, 0, this.nextNum++);
+    },
+    handleRemove() {
+      const index = Math.floor(Math.random() * this.lists.length);
+      this.lists.splice(index, 1);
+    },
+    handleShuffle() {
+      this.lists.sort(() => Math.random() - 0.5);
     },
   },
 };
 </script>
+
 <style scoped>
-div {
-  margin-top: 15px;
+button {
+  margin-bottom: 10px;
+  margin-right: 10px;
 }
+
+ul,
+li {
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style: none;
+  /* 这要用inline就不会不好使 */
+  display: inline-block;
+  margin-right: 10px;
+}
+
 .v-enter,
 .v-leave-to {
   opacity: 0;
+  transform: translateY(30px);
 }
+
 .v-enter-active,
 .v-leave-active {
-  transition: all 0.5s;
+  transition: all 0.3s;
 }
-.v-enter-to,
-.v-leave {
+
+.v-leave,
+.v-enter-to {
   opacity: 1;
+  transform: translateY(0px);
+}
+
+/* 洗牌时样式 
+ * 因为v-enter-active v-leave-active用的是transform 
+ * 所以洗牌时用 transform
+ */
+.v-move {
+  transition: transform 0.3s;
 }
 </style>

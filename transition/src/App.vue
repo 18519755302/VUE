@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import BaseDemo from "./components/BaseDemo5.vue";
+import BaseDemo from "./components/BaseDemo2.vue";
 
 export default {
   name: "App",
