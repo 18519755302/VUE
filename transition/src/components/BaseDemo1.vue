@@ -1,51 +1,34 @@
 <template>
   <div>
     <button @click="show = !show">click</button>
+    <!-- 多个div 过渡 -->
     <transition>
-      <div class="box" v-if="show">i am ok</div>
+      <div v-if="show" key="world">hello world</div>
+      <div else key="shanshan">hello shanshan</div>
     </transition>
   </div>
 </template>
 <script>
 export default {
   data() {
-    return {
-      show: true,
-    };
+    return { show: true };
   },
 };
 </script>
 <style scoped>
-.box {
-  margin-top: 30px;
-  width: 150px;
-  height: 150px;
-  border: 1px solid red;
-  text-align: center;
-  line-height: 150px;
+div {
+  margin-top: 15px;
 }
-
-.v-enter {
-  opacity: 0;
-}
-
-.v-enter-active {
-  transition: opacity 1s;
-}
-
-.v-enter-to {
-  opacity: 1;
-}
-
-.v-leave {
-  opacity: 1;
-}
-
-.v-leave-active {
-  transition: opacity 3s;
-}
-
+.v-enter,
 .v-leave-to {
   opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
 }
 </style>

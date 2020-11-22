@@ -1,33 +1,38 @@
 <template>
   <div>
-    <button @click="show = !show">click4</button>
-    <!-- https://daneden.github.io/animate.css/ -->
-    <!-- 用这个网址样式，样式里必须用 animated -->
-    <!-- bounceInRight rubberBand 网址里所选样式 -->
-    <transition
-      enter-active-class="animated bounceInRight"
-      leave-active-class="animated rubberBand"
-    >
-      <div class="box" v-show="show">i am ok</div>
+    <button @click="handle()">click</button>
+    <!-- mode='in-out' 新元素先进行过渡，完成之后当前元素过渡离开 -->
+    <transition mode="in-out">
+      <div :key="keyName">hello {{ keyName }}</div>
     </transition>
   </div>
 </template>
 <script>
 export default {
   data() {
-    return {
-      show: true,
-    };
+    return { keyName: "world" };
+  },
+  methods: {
+    handle() {
+      this.keyName = this.keyName === "world" ? "shanshan" : "world";
+    },
   },
 };
 </script>
 <style scoped>
-.box {
-  margin-top: 30px;
-  width: 150px;
-  height: 150px;
-  border: 1px solid red;
-  text-align: center;
-  line-height: 150px;
+div {
+  margin-top: 15px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
 }
 </style>

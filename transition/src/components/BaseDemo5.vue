@@ -1,44 +1,41 @@
 <template>
   <div>
-    <button @click="show = !show">click4</button>
-    <!-- 添加type 过渡时间只有type的类型决定 -->
-    <transition
-      type="animation"
-      enter-active-class="animated tada enter"
-      leave-active-class="animated tada leave"
-    >
-      <div class="box" v-show="show">i am ok</div>
+    <button @click="handle()">click</button>
+    <!-- 动态组件 -->
+    <transition mode="out-in">
+      <component :is="cmpName"></component>
     </transition>
   </div>
 </template>
 <script>
+import Demo1 from "./BaseDemo5-1";
+import Demo2 from "./BaseDemo5-2";
 export default {
+  components: {
+    Demo1,
+    Demo2,
+  },
   data() {
-    return {
-      show: true,
-    };
+    return { cmpName: "demo1" };
+  },
+  methods: {
+    handle() {
+      this.cmpName = this.cmpName === "demo1" ? "demo2" : "demo1";
+    },
   },
 };
 </script>
 <style scoped>
-.box {
-  margin-top: 30px;
-  width: 150px;
-  height: 150px;
-  border: 1px solid red;
-  text-align: center;
-  line-height: 150px;
+div {
+  margin-top: 15px;
 }
 .v-enter,
 .v-leave-to {
   opacity: 0;
 }
-
-.leave {
-  transition: all 13s;
-}
-.enter {
-  transition: all 3s;
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
 }
 .v-enter-to,
 .v-leave {
