@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="list">
-      <span class="left">helloWorld</span>
+      <span class="left" @click="handleClick"> helloWorld </span>
+      <!-- <router-link to="/demo1" class="left" tag="span">helloWorld</router-link> -->
       <div class="right">
         <router-link to="/demo1">demo1</router-link>
         <router-link to="/demo2">demo2</router-link>
@@ -17,9 +18,16 @@
 
 <script>
 import "./assets/reset.css";
+
 export default {
   name: "App",
   components: {},
+  methods: {
+    handleClick() {
+      //点击 跳转demo1
+      this.$router.push({ name: "demo1" });
+    },
+  },
 };
 </script>
 

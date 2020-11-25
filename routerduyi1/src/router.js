@@ -1,6 +1,6 @@
 import VueRouter from 'vue-router'
 import Vue from 'vue';
-import Demo1 from './components/BaseDemo1'
+//import Demo1 from './components/BaseDemo1'
 
 Vue.use(VueRouter);
 
@@ -10,6 +10,7 @@ const routes = [{
     //重定向 redirect:'对应的path'
     redirect: '/demo1'
 }, {
+    name: 'demo1',
     //为了让linkActiveClass类在选中别的类时不匹配上这个组件
     path: '/demo1',
     component: () => import('./components/BaseDemo1')
@@ -21,7 +22,7 @@ const routes = [{
     component: () => import('./components/BaseDemo3')
 }, {
     path: '/demo4',
-    component: () => import('./components/BaseDemo4'),
+    component: () => import( /* webpackChunkName:"demo4-1"*/ './components/BaseDemo4'),
     redirect(to) {
         return {
             name: '4-1',
@@ -30,7 +31,7 @@ const routes = [{
     children: [{
         name: '4-1',
         path: "BaseDemo4-1",
-        component: () => import('./components/BaseDemo4-1')
+        component: () => import( /* webpackChunkName:"demo4-1"*/ './components/BaseDemo4-1')
     }, {
         name: '4-2',
         path: "BaseDemo4-2",
