@@ -19,22 +19,29 @@
 </template>
 <script>
 export default {
+  //接收路由参数，如果不接收id,id 则不会有值
+  props: ["id", "name"],
   data() {
     return {
       question: null,
     };
   },
+  mounted() {
+    console.log(this.id);
+    console.log(this.name);
+  },
   methods: {
     //获取问题数据
     getData() {
-      const { id } = this.$route.params;
+      const id = this.id;
+      //const { id } = this.$route.params;
       this.$axios.get(`/question/${id}`).then((res) => {
         this.question = res;
       });
     },
     //编程式导航
     handlerClick(id) {
-      const { name } = this.$route;
+      const name = "question";
       this.$router.push({
         name,
         params: {
@@ -66,7 +73,6 @@ export default {
           });
         }
       }
-      console.log(arr);
       return arr;
     },
   },

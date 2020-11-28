@@ -12,6 +12,7 @@
     </div>
     <div class="view">
       <router-view></router-view>
+      <router-view name="minming"></router-view>
     </div>
   </div>
 </template>

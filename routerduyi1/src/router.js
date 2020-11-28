@@ -17,6 +17,12 @@ const routes = [{
     }, {
         path: '/demo2',
         component: () => import('./components/BaseDemo2')
+        // components: {
+        //     //命名为minming的路由
+        //     minming: () => import('./components/BaseDemo3'),
+        //     //如果vue文件上没写name 则默认是default
+        //     default: () => import('./components/BaseDemo2')
+        // }
     }, {
         path: '/demo3',
         component: () => import('./components/BaseDemo3')
@@ -46,6 +52,13 @@ const routes = [{
         //具体问题页面
         name: 'question',
         path: '/demo4/question/:id',
+        //props为一函数 参数就是$route
+        props: route => {
+            return {
+                id: route.params.id,
+                name: route.name
+            }
+        },
         component: () => import('./components/Question')
     }
 ]
