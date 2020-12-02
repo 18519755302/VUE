@@ -1,6 +1,6 @@
 import VueRouter from 'vue-router'
 import Vue from 'vue';
-//import Demo1 from './components/BaseDemo1'
+import Cookie from './utils/cookie';
 
 Vue.use(VueRouter);
 
@@ -13,10 +13,13 @@ const routes = [{
         name: 'demo1',
         //为了让linkActiveClass类在选中别的类时不匹配上这个组件
         path: '/demo1',
-        component: () => import('./components/BaseDemo1')
+        component: () => import('./components/BaseDemo1'),
     }, {
         path: '/demo2',
-        component: () => import('./components/BaseDemo2')
+        component: () => import('./components/BaseDemo2'),
+        beforeEnter: (to, from, next) => {
+            next();
+        }
         // components: {
         //     //命名为minming的路由
         //     minming: () => import('./components/BaseDemo3'),
@@ -25,7 +28,14 @@ const routes = [{
         // }
     }, {
         path: '/demo3',
-        component: () => import('./components/BaseDemo3')
+        component: () => import('./components/BaseDemo3'),
+        meta: {
+            login: true
+        },
+        beforeEnter: (to, from, next) => {
+            console.log('beforeEnter demo3');
+            next();
+        }
     }, {
         path: '/demo4',
         component: () => import( /* webpackChunkName:"demo4-1"*/ './components/BaseDemo4'),
@@ -33,6 +43,13 @@ const routes = [{
             return {
                 name: '4-1',
             }
+        },
+        meta: {
+            login: true
+        },
+        beforeEnter: (to, from, next) => {
+            console.log('beforeEnter demo4');
+            next();
         },
         children: [{
             name: '4-1',
@@ -60,6 +77,9 @@ const routes = [{
             }
         },
         component: () => import('./components/Question')
+    }, {
+        path: '/login',
+        component: () => import('./components/Login')
     }
 ]
 
@@ -70,6 +90,37 @@ const router = new VueRouter({
     linkActiveClass: "link-active",
     //选中完全匹配的类名
     linkExactActiveClass: "link-exact-active"
+})
+
+//全局路由 beforeEach
+router.beforeEach((to, from, next) => {
+    console.log('beforeEach');
+    //登入状态
+    const isLogin = Cookie.isLogin();
+    if (isLogin) {
+        //已登入
+        next();
+    } else {
+        //未登入
+        const loginIn = to.matched.some(item => item.meta.login);
+        if (loginIn) {
+            const isLogin = window.confirm('查看请登入，要去登入吗？');
+            isLogin == true ? next('/login') : next(false);
+        } else {
+            next();
+        }
+    }
+})
+
+//全局路由 beforeResolve
+router.beforeResolve((to, from, next) => {
+    console.log('beforeResolve');
+    next();
+})
+
+//全局路由 afterEach
+router.afterEach((to, from) => {
+    console.log('afterEach');
 })
 
 export default router;

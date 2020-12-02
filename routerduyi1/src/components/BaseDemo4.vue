@@ -10,6 +10,9 @@
     </div>
   </div>
 </template>
+<script>
+export default {};
+</script>
 <style scoped>
 .children {
   margin-bottom: 30px;
