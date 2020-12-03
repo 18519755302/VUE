@@ -1,5 +1,11 @@
 <template>
-  <div>demo2</div>
+  <div>
+    demo2
+    <div id="a">a可由首页跳到此处</div>
+    <!-- <div class="buttom">
+      <router-link to="/demo1">demo1</router-link>
+    </div> -->
+  </div>
 </template>
 <script>
 export default {
@@ -17,3 +23,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+.buttom {
+  margin-top: 1000px;
+}
+#a {
+  margin-top: 1500px;
+}
+</style>

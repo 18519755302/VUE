@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <div class="list">
       <span class="left" @click="handleClick"> helloWorld </span>
       <!-- <router-link to="/demo1" class="left" tag="span">helloWorld</router-link> -->
@@ -11,8 +11,9 @@
       </div>
     </div>
     <div class="view">
-      <router-view></router-view>
-      <router-view name="minming"></router-view>
+      <transition>
+        <router-view></router-view>
+      </transition>
     </div>
   </div>
 </template>
@@ -33,6 +34,18 @@ export default {
 </script>
 
 <style>
+#app {
+  overflow-x: hidden;
+}
+.v-enter {
+  transform: translateX(1000px);
+}
+.v-enter-to {
+  transform: translateX(0);
+}
+.v-enter-active {
+  transition: all 0.5s;
+}
 .list {
   display: flex;
   justify-content: space-between;

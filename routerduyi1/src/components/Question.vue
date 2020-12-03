@@ -26,6 +26,7 @@ export default {
   beforeRouteUpdate(to, from, next) {
     console.log("beforeRouteUpdate question");
     next();
+
     //同路由 获取数据
     //此句由于给父组件传来的id 直接赋值，会被警告
     this.id = to.params.id;
@@ -39,12 +40,11 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
-    console.log("beforeRouteLeave question");
+    //console.log("beforeRouteLeave question");
     const go = window.confirm("真的要走吗？不再看看吗？");
     go == true ? next() : next(false);
   },
   mounted() {
-    console.log("mounted");
     this.getData();
   },
   data() {
@@ -97,14 +97,7 @@ export default {
       }
       return arr;
     },
-    qId: {
-      get() {
-        return this.id;
-      },
-      set() {},
-    },
   },
-
   // watch: {
   //   //不同id 路由信息会改变
   //   $route: {

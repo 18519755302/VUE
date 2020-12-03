@@ -89,7 +89,20 @@ const router = new VueRouter({
     //类名
     linkActiveClass: "link-active",
     //选中完全匹配的类名
-    linkExactActiveClass: "link-exact-active"
+    linkExactActiveClass: "link-exact-active",
+    scrollBehavior(to, from, savedPosition) {
+        console.log(to.hash);
+        // return 期望滚动到哪个的位置
+        if (to.hash) {
+            return {
+                selector: to.hash // selector 的 值为 hash值
+            }
+        }
+        return {
+            x: 0,
+            y: 0
+        }
+    }
 })
 
 //全局路由 beforeEach
