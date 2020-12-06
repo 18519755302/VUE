@@ -7014,8 +7014,8 @@ Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用�
 Vue 提供了 transition 的封装组件，在下列情形中，可以给任何元素和组件添加进入/离开过渡
 - 条件渲染 (使用 v-if)
 - 条件展示 (使用 v-show)
-- 动态组件
-- 组件根节点
+- 动态组件 
+- 组件根节点 
 
 ## 过渡的类名
 在进入/离开的过渡中，会有 6 个 class 切换。
@@ -7024,7 +7024,7 @@ Vue 提供了 transition 的封装组件，在下列情形中，可以给任何�
 
 1. v-enter：
   定义进入过渡的开始状态。
-  在元素被插入之前生效，在元素被插入之后的下一帧移除。
+  ``在元素被插入之前生效``在元素被插入之后的下一帧移除。
 
 2. v-enter-active：
   定义进入过渡生效时的状态。
@@ -7033,13 +7033,13 @@ Vue 提供了 transition 的封装组件，在下列情形中，可以给任何�
 
 3. v-enter-to: 
   定义进入过渡的结束状态(2.1.8+) 。
-  在元素被插入之后下一帧生效 (与此同时 v-enter 被移除)，在过渡/动画完成之后移除。
+  ``在元素被插入之后下一帧生效`` (与此同时 v-enter 被移除)，在过渡/动画完成之后移除。
 
 <hr />
 
 4. v-leave：
   定义离开过渡的开始状态。
-  在离开过渡被触发时立刻生效，下一帧被移除。
+  ``在元素被删除之前生效``下一帧被移除。
 
 5. v-leave-active：
   定义离开过渡生效时的状态。
@@ -7050,7 +7050,60 @@ Vue 提供了 transition 的封装组件，在下列情形中，可以给任何�
   定义离开过渡的结束状态(2.1.8+) 。
   在离开过渡被触发之后下一帧生效 (与此同时 v-leave 被删除)，在过渡/动画完成之后移除。
 <hr />
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <transition>
+      <div class="box" v-if="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
 
+.v-enter {
+  opacity: 0;
+}
+
+.v-enter-active {
+  transition: opacity 1s;
+}
+
+.v-enter-to {
+  opacity: 1;
+}
+
+.v-leave {
+  opacity: 1;
+}
+
+.v-leave-active {
+  transition: opacity 3s;
+}
+
+.v-leave-to {
+  opacity: 0;
+}
+</style>
+```
 图示：
 ![过渡](https://cn.vuejs.org/images/transition.png)
 
@@ -7062,9 +7115,127 @@ Vue 提供了 transition 的封装组件，在下列情形中，可以给任何�
 2. transition 有 name 特性
   如 name 为 fade，则类名前缀为fade-。
 
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <transition name="box1">
+      <div class="box" v-show="show">i am ok</div>
+    </transition>
+    <transition name="box2">
+      <div class="box" v-show="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+.box1-leave,
+.box1-enter-to {
+  opacity: 1;
+}
+.box1-leave-active,
+.box1-enter-active {
+  transition: opacity 3s;
+}
+.box1-leave-to,
+.box1-enter {
+  opacity: 0;
+}
+
+.box2-leave,
+.box2-enter-to {
+  opacity: 1;
+}
+.box2-leave-active,
+.box2-enter-active {
+  transition: opacity 3s;
+}
+.box2-leave-to,
+.box2-enter {
+  opacity: 0;
+}
+</style>
+```
 ## CSS 动画
 CSS 动画用法同 CSS 过渡，区别是在动画中 v-enter 类名在节点插入 DOM 后不会立即删除，而是在 animationend 事件触发时删除。
 
+举例（组件）：应用
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <transition>
+      <div class="box" v-show="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+/* .v-leave,
+.v-enter-to {
+  opacity: 1;
+} */
+.v-leave-active {
+  animation: animate 1s reverse;
+}
+
+.v-enter-active {
+  animation: animate 1s;
+}
+
+/* .v-leave-to,
+.v-enter {
+  opacity: 0;
+} */
+@keyframes animate {
+  0% {
+    opacity: 0;
+    transform: translateX(400px) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(200px) scale(1.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px) scale(1);
+  }
+}
+</style>
+```
 ## 自定义过渡的类名
 我们可以通过以下 attribute 来自定义过渡类名：
 
@@ -7075,17 +7246,104 @@ CSS 动画用法同 CSS 过渡，区别是在动画中 v-enter 类名在节点�
 - leave-active-class
 - leave-to-class (2.1.8+)
 
-他们的优先级高于普通的类名，这对于 Vue 的过渡系统和其他第三方 CSS 动画库（如 Animate.css）结合使用十分有用。
+他们的优先级高于普通的类名，这对于 Vue 的过渡系统和其他第三方 CSS 动画库（如 Animate.css）结合使用十分有用。Animate.css的版本必须为^3.7.2
 
 Animate.css 官网地址：https://daneden.github.io/animate.css/
 安装方式：``npm install animate.css --save``
 
+举例（组件）：应用
+```html
+<template>
+  <div>
+    <button @click="show = !show">click4</button>
+    <!-- https://daneden.github.io/animate.css/ -->
+    <!-- 用这个网址样式，样式里必须用 animated -->
+    <!-- bounceInRight rubberBand 网址里所选样式 -->
+    <transition
+      enter-active-class="animated bounceInRight"
+      leave-active-class="animated rubberBand"
+    >
+      <div class="box" v-show="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+</style>
+```
 ## 同时使用过渡和动画
 
 可使用 type 属性，来声明需要 Vue 监听的类型，type值可为 animation 或 transition 。
 
-当不设置type时，默认会取 transitioned 和 animationed 两者更长的为结束时刻。
+当不设置type时，默认会取 transitioned 和 animationed 两者更长的为结束时刻。如果设置，就会取设置类型的时间为准。
 
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click4</button>
+    <!-- 添加type 过渡时间只有type的类型决定 -->
+    <!-- 没写type 就会按时间更长的时间为准 -->
+    <transition
+      type="animation"
+      enter-active-class="animated tada enter"
+      leave-active-class="animated tada leave"
+    >
+      <div class="box" v-show="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+
+.leave {
+  transition: all 13s;
+}
+.enter {
+  transition: all 3s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
 ## 显性的过渡时间
 在一些情况下，Vue可以自动得出过渡效果的完成时机，从而对dom进行处理。
 
@@ -7100,6 +7358,125 @@ Animate.css 官网地址：https://daneden.github.io/animate.css/
 <transition :duration="{ enter: 500, leave: 800 }">...</transition>
 ```
 
+
+举例（组件）：应用
+```html
+<template>
+  <div>
+    <button @click="show = !show">click4</button>
+    <!-- duration 过渡时间，如果有了它，其他定义时间就不好使 -->
+    <transition
+      :duration="1000"
+      enter-active-class="animated tada enter"
+      leave-active-class="animated tada leave"
+    >
+      <div class="box" v-show="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+
+.leave {
+  transition: all 13s;
+}
+.enter {
+  transition: all 10s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
+
+:duration也可以在父级定义，以防父级动画结束后子级动画没完成，在父级定义子级动画完成时间来完成子级定义的动画。
+
+举例（组件）：应用
+```html
+<template>
+  <div>
+    <button @click="show = !show">click4</button>
+    <!-- duration 过渡时间， -->
+    <transition :duration="{ enter: 2000, leave: 6000 }">
+      <div class="box" v-show="show">
+        <transition name="span">
+          <span v-if="show">hello world</span>
+        </transition>
+      </div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+
+.v-leave-active {
+  transition: all 13s;
+}
+.v-enter-active {
+  transition: all 10s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+.span-enter,
+.span-leave-to {
+  font-size: 12px;
+}
+
+.span-enter-active,
+.span-leave-active {
+  transition: all 2s;
+}
+
+.span-enter-to,
+.span-leave {
+  font-size: 20px;
+}
+</style>
+```
+
 ## 初始渲染的过渡
 可以通过 ``appear`` attribute 设置节点在初始渲染的过渡。
 
@@ -7109,7 +7486,64 @@ appear-class="appear-enter"
 appear-active-class="appear-enter-active"
 appear-to-class="appear-enter-to"
 ```
+但是用自定义类名，需在类里添加``appear``，才可以在初始渲染时产生过渡效果
 
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <!-- appear 刷新初始化页面会有过渡 -->
+    <!-- appear-active-class 如果有对应类写在这里，但是也是要加 appear-->
+    <transition appear appear-active-class="animated swing">
+      <div class="box" v-if="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+
+.v-enter {
+  opacity: 0;
+}
+
+.v-enter-active {
+  transition: opacity 1s;
+}
+
+.v-enter-to {
+  opacity: 1;
+}
+
+.v-leave {
+  opacity: 1;
+}
+
+.v-leave-active {
+  transition: opacity 3s;
+}
+
+.v-leave-to {
+  opacity: 0;
+}
+</style>
+```
 ## JavaScript 钩子
 可以在属性中声明 JavaScript 钩子:
 
@@ -7129,8 +7563,8 @@ appear-to-class="appear-enter-to"
 </transition>
 ```
 
-- before-enter 动画入场前，可以在其中设置元素开始动画之前的起始样式
-- enter 动画入场中，可以在其中写动画
+- before-enter 动画入场前，可以在其中设置元素开始动画之前的起始样式，参数为el代表元素
+- enter 动画入场中，可以在其中写动画,在其中写done()可以手动直接调用after-enter方法，第一个参数为el代表元素，第二个参数为done。done.canceled = true可以调用enter-cancelled方法来取消动画，但是很多时候不好使，一般不使用。
 - after-enter 动画完成后
 - enter-cancelled 取消动画
 
@@ -7148,13 +7582,202 @@ appear-to-class="appear-enter-to"
   <!-- ... -->
 </transition>
 ```
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <!-- :css="false" 可以直接跳过css -->
+    <transition
+      :css="false"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @after-enter="afterEnter"
+      @enter-cancelled="enterCancelled"
+      @before-leave="beforeLeave"
+      @leave="leave"
+      @after-leave="afterLeave"
+      @leave-cancelled="leaveCancelled"
+    >
+      <div class="box" v-if="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+  methods: {
+    beforeEnter(el) {
+      el.style.opacity = 0;
+    },
+    enter(el, done) {
+      //在整个动画结束后，下一个动画开始时触发访问enterCancelled方法,
+      //但是 done.canceled所在方法里有异步函数就不会执行enterCancelled方法
+      //一般不会使用这个方法，因为不太好使
+      //done.canceled = true;
+      setTimeout(() => {
+        done(); //主动调用afterEnter
+      }, 5000);
+    },
+    afterEnter(el) {
+      console.log(el, "afterEnter");
+      el.style.opacity = 1;
+    },
+    enterCancelled(el) {
+      console.log(el, "enterCancelled");
+    },
+    beforeLeave(el) {
+      el.style.opacity = 1;
+    },
+    leave(el, done) {
+      setTimeout(() => {
+        done(); //主动调用afterLeave
+      }, 5000);
+    },
+    afterLeave(el) {
+      console.log(el, "afterLeave");
+      el.style.opacity = 0;
+    },
+    leaveCancelled(el) {
+      console.log(el, "afterEnter");
+    },
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
 
+.v-enter {
+  opacity: 0;
+}
+
+.v-enter-active {
+  transition: opacity 1s;
+}
+
+.v-enter-to {
+  opacity: 1;
+}
+
+.v-leave {
+  opacity: 1;
+}
+
+.v-leave-active {
+  transition: opacity 3s;
+}
+
+.v-leave-to {
+  opacity: 0;
+}
+</style>
+```
 > 结合 Velocity.js
 
 Velocity.js 官网地址：http://velocityjs.org/
 安装方式: ``npm install velocity-animate``
+具有过渡效果 
+Velocity(元素，{变化状态},{时间duration,完成状态（可填）})
 
-# 过渡_多元素过渡
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <!-- :css="false" 可以直接跳过css -->
+    <!--  @before-leave="beforeLeave"
+      @leave="leave"
+      @after-leave="afterLeave"
+      @leave-cancelled="leaveCancelled" -->
+    <transition
+      :css="false"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @after-enter="afterEnter"
+      @enter-cancelled="enterCancelled"
+    >
+      <div class="box" v-if="show">i am ok</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+  methods: {
+    beforeEnter(el) {
+      el.style.opacity = 0;
+    },
+    enter(el, done) {
+      // 具有过渡效果 Velocity(元素，{变化状态},{时间duration,完成状态（可填）})
+      Velocity(el, { opacity: 1 }, { duration: 1000 });
+      Velocity(el, { rotateZ: 10 }, { duration: 300 });
+      Velocity(el, { rotateZ: -10 }, { duration: 300 });
+      // complete: done 这句可以在访问enter方法之后直接访问afterEnter方法
+      Velocity(el, { rotateZ: 0 }, { duration: 300, complete: done });
+    },
+    afterEnter(el) {
+      console.log("afterEnter");
+    },
+    enterCancelled(el) {},
+    beforeLeave(el) {},
+    leave(el, done) {},
+    afterLeave(el) {},
+    leaveCancelled(el) {},
+  },
+};
+</script>
+<style scoped>
+.box {
+  margin-top: 30px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid red;
+  text-align: center;
+  line-height: 150px;
+}
+
+.v-enter {
+  opacity: 0;
+}
+
+.v-enter-active {
+  transition: opacity 1s;
+}
+
+.v-enter-to {
+  opacity: 1;
+}
+
+.v-leave {
+  opacity: 1;
+}
+
+.v-leave-active {
+  transition: opacity 3s;
+}
+
+.v-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+# 过渡_多元素过渡（切换展示多元素）
 
 当切换展示的元素标签名相同时，需要给每一个元素设置不同的key值，否则Vue为了效率只会替换相同标签内部的内容。
 
@@ -7164,7 +7787,43 @@ Velocity.js 官网地址：http://velocityjs.org/
   <div v-else key="shanshan">hello shanshan</div>
 </transition>
 ```
-
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">click</button>
+    <!-- 多个div 过渡 -->
+    <transition>
+      <div v-if="show" key="world">hello world</div>
+      <div else key="shanshan">hello shanshan</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return { show: true };
+  },
+};
+</script>
+<style scoped>
+div {
+  margin-top: 15px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
 在一些场景中，可以通过给同一个元素的key值设置不同的状态来替代 v-if 和 v-else。如：
 
 ```html
@@ -7176,25 +7835,194 @@ Velocity.js 官网地址：http://velocityjs.org/
 ```js
 keyName: 'world',
 ```
-
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="handle()">click</button>
+    <!-- 多个div 过渡 -->
+    <transition>
+      <div :key="keyName">hello {{ keyName }}</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return { keyName: "world" };
+  },
+  methods: {
+    handle() {
+      this.keyName = this.keyName === "world" ? "shanshan" : "world";
+    },
+  },
+};
+</script>
+<style scoped>
+div {
+  margin-top: 15px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
 ## 过渡模式
 Vue提供一个一个 mode 特性，可以给多个元素过渡应用不同的模式，mode 的值可为：
 
 - in-out：新元素先进行过渡，完成之后当前元素过渡离开。
 - out-in：当前元素先进行过渡，完成之后新元素过渡进入。
 
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="handle()">click</button>
+    <!-- mode='out-in' 当前元素先进行过渡，完成之后新元素过渡进入 -->
+    <transition mode="out-in">
+      <div :key="keyName">hello {{ keyName }}</div>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return { keyName: "world" };
+  },
+  methods: {
+    handle() {
+      this.keyName = this.keyName === "world" ? "shanshan" : "world";
+    },
+  },
+};
+</script>
+<style scoped>
+div {
+  margin-top: 15px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
 ## 多组件过渡
 我们可以使用动态组件切换展示不同的组件。
 
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="handle()">click</button>
+    <!-- 动态组件 -->
+    <transition mode="out-in">
+      <component :is="cmpName"></component>
+    </transition>
+  </div>
+</template>
+<script>
+import Demo1 from "./BaseDemo5-1";
+import Demo2 from "./BaseDemo5-2";
+export default {
+  components: {
+    Demo1,
+    Demo2,
+  },
+  data() {
+    return { cmpName: "demo1" };
+  },
+  methods: {
+    handle() {
+      this.cmpName = this.cmpName === "demo1" ? "demo2" : "demo1";
+    },
+  },
+};
+</script>
+<style scoped>
+div {
+  margin-top: 15px;
+}
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
 # 过渡_列表过渡
 当想要给一个列表添加过渡动效时，我们可以使用 ``<transition-group>`` 组件。
 
 该组件的特点：
-- 不同于 <transition>，它会以一个真实元素呈现：默认为一个 ``<span>``。你也可以通过 tag attribute 更换为其他元素。
+- 不同于 <transition>，它会以一个真实元素呈现：默认为一个 ``<span>``来包裹transition-group内部元素。你也可以通过 tag attribute 更换为其他元素。
 - 过渡模式不可用，因为我们不再相互切换特有的元素。
 - 内部元素 总是需要 提供唯一的 key 属性值。
 - CSS 过渡的类将会应用在内部的元素中，而不是这个组/容器本身。
 
+举例（组件）：
+```html
+<template>
+  <div class="demo">
+    <button @click="show = !show">click</button>
+    <!-- transition-group 包裹多元素过渡 一定需要key-->
+    <!-- tag 可用来定义包裹元素标签 -->
+    <transition-group tag="div">
+      <div key="world" v-if="show">hello wrold</div>
+      <div key="shanshan" v-if="show">hello shanshan</div>
+    </transition-group>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.3s;
+}
+
+.v-leave,
+.v-enter-to {
+  opacity: 1;
+}
+</style>
+```
 ## 列表的排序过渡
 ``<transition-group>`` 组件提供了一个新的特性：v-move，它会在元素改变定位的过程中应用。
 如何使用？通过类名即可设置：.v-move {}。
@@ -7206,14 +8034,253 @@ Vue提供一个一个 mode 特性，可以给多个元素过渡应用不同的�
 
 需要注意的是使用 FLIP 过渡的元素不能设置为 display: inline 。作为替代方案，可以设置为 display: inline-block 或者放置于 flex 中。
 
+举例（组件）：
+```html
+<template>
+  <div class="demo">
+    <button @click="handleAdd">添加</button>
+    <button @click="handleRemove">移除</button>
+    <button @click="handleShuffle">洗牌</button>
+
+    <br />
+    <transition-group tag="ul">
+      <li v-for="item in lists" :key="item">{{ item }}</li>
+    </transition-group>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      lists: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      nextNum: 11,
+    };
+  },
+  methods: {
+    handleAdd() {
+      const index = Math.floor(Math.random() * this.lists.length);
+      this.lists.splice(index, 0, this.nextNum++);
+    },
+    handleRemove() {
+      const index = Math.floor(Math.random() * this.lists.length);
+      this.lists.splice(index, 1);
+    },
+    handleShuffle() {
+      this.lists.sort(() => Math.random() - 0.5);
+    },
+  },
+};
+</script>
+
+<style scoped>
+button {
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+ul,
+li {
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style: none;
+  /* 这要用inline就不会不好使 */
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.3s;
+}
+
+.v-leave,
+.v-enter-to {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+/* 洗牌时样式 
+ * 因为v-enter-active v-leave-active用的是transform 
+ * 所以洗牌时用 transform
+ */
+.v-move {
+  transition: transform 0.3s;
+}
+</style>
+```
 ## 列表的交错过渡
 如果要给列表中的元素，应用更丰富的过渡效果，可以配合JavaScript钩子。
+
+举例（组件）：
+```html
+<template>
+  <div class="demo">
+    <input type="text" v-model="query">
+    <transition-group 
+      tag="ul"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @leave="leave"
+    >
+      <li
+        v-for="item in computedLists"
+        :key="item.name"
+      >{{ item.name }}</li>
+    </transition-group>
+    
+  </div>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      query: '',
+      lists: [
+        { name: 'shanshan'},
+        { name: 'jicheng'},
+        { name: 'chensitong'},
+        { name: 'dengxuming'},
+      ]
+    }
+  },
+  computed: {
+    computedLists () {
+      return this.lists.filter(item => item.name.includes(this.query));
+    },
+  },
+  methods: {
+    beforeEnter (el) {
+      el.style.opacity = 0;
+      el.style.height = 0;
+    },
+    enter (el, done) {
+      Velocity(el, { opacity: 1, height: '24px' }, { duration: 300, complete: done })
+    },
+    leave (el, done) {
+      Velocity(el, { opacity: 0, height: '0px' }, { duration: 300, complete: done })
+    }
+  },
+}
+</script>
+
+<style scoped>
+li {
+  height: 24px;
+}
+</style>
+```
 
 # 过渡_复用过渡
 过渡可以通过 Vue 的组件系统实现复用。要创建一个可复用过渡组件，你需要做的就是将 <transition> 或者 <transition-group> 作为根组件，然后将任何子组件放置在其中就可以了。
 
-注意：当使用函数式组件复用过渡时，不要设置css作用域。
+注意：当使用函数式组件复用过渡时，不要设置css作用域（style 里的scoped需要去除，如果不去除过渡就会不好使）
 
+举例（组件）：
+主 组件
+```html
+<template>
+  <div>
+    <button @click="show = !show">点我</button>
+    <fu-yong>
+      <div v-if="show">hello world</div>
+    </fu-yong>
+  </div>
+</template>
+<script>
+//组件  过渡复用
+//import FuYong from "./FuYong";
+//函数式组件 过渡复用
+//import FuYong from "./FuyongHanshu";
+export default {
+  components: {
+    FuYong,
+  },
+  data() {
+    return {
+      show: true,
+    };
+  },
+};
+</script>
+<style scoped>
+button {
+  margin-bottom: 30px;
+}
+</style>
+```
+调用组件①
+```html
+<template>
+  <div>
+    <transition>
+      <slot></slot>
+    </transition>
+  </div>
+</template>
+<script>
+export default {
+  name: "FuYong",
+};
+</script>
+<style scoped>
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 3s;
+}
+.v-enter-to,
+.v-leave {
+  opacity: 1;
+}
+</style>
+```
+调用组件②
+```html
+<script>
+//函数式组件 复用
+export default {
+  name: "FuyongHanshu",
+  functional: true,
+  render(h, context) {
+    const { slots } = context;
+    return (
+      <div>
+        <transition name="single">{slots().default}</transition>
+      </div>
+    );
+  },
+};
+</script>
+<style >
+/* style 里的scoped使用函数式组件需要去除，如果不去除过渡就会不好使 */
+.single-enter,
+.single-leave-to {
+  opacity: 0;
+}
+.single-enter-active,
+.single-leave-active {
+  transition: all 3s;
+}
+.single-enter-to,
+.single-leave {
+  opacity: 1;
+}
+</style>
+```
 # 组件_异步组件
 在项目中，有些组件不会在第一次进入首屏时加载，而是当执行了某些操作时，才会加载进来，所以此时，我们可以将该组件设置成异步加载，什么时候用，什么时候再加载进来，以达到提升首屏性能的目的。
 
@@ -7223,18 +8290,73 @@ components: {
   AsyncCmp: () => import (url);
 }
 ```
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">点我</button>
+    <async-demo v-if="show"> </async-demo>
+  </div>
+</template>
+<script>
+export default {
+  components: {
+    AsyncDemo: () => import("./BaseDemo2"),
+  },
+  data() {
+    return {
+      show: false,
+    };
+  },
+};
+</script>
+<style scoped>
+button {
+  margin-bottom: 30px;
+}
+</style>
+```
 
-将多个需要同时加载的组件合并到一个文件中：
-
+将多个需要同时加载的组件合并到一个文件中,文件名为async,这样效率会提高：
 ```js
 components: {
   AsyncCmp1: () => import(/* webpackChunkName: "async" */ 'url'),
   AsyncCmp2: () => import(/* webpackChunkName: "async" */ 'url'),
 }
 ```
+举例（组件）：
+```html
+<template>
+  <div>
+    <button @click="show = !show">点我</button>
+    <async-demo2 v-if="show"> </async-demo2>
+    <async-demo3 v-if="show"> </async-demo3>
+  </div>
+</template>
+<script>
+export default {
+  components: {
+    AsyncDemo2: () => import(/* webpackChunkName: "async" */ "./BaseDemo2"),
+    AsyncDemo3: () => import(/* webpackChunkName: "async" */ "./BaseDemo3"),
+  },
+  data() {
+    return {
+      show: false,
+    };
+  },
+};
+</script>
+<style scoped>
+button {
+  margin-bottom: 30px;
+}
+</style>
+```
 
+``<link href="/js/0.js" rel="prefetch"> ``
+``<link href="/js/app.js" rel="preload" as="script"> ``
 异步加载的文件，会在link标签上设置 el="prefech"。浏览器会在空闲时间内下载对应的资源，使用时可以直接从缓存中获取。与之对应的 el="preload"，会及时下载对应的资源。
-
+(``<script type="text/javascript" src="/js/app.js"></script>``这个js里写的都是我们写的东西。``<script type="text/javascript" src="/js/chunk-vendors.js"></script>``这里面写的是我们引入的组件)
 
 # VueRouter_基础
 
@@ -7260,12 +8382,16 @@ import VueRouter from 'vue-router';
 ```js
 Vue.use(VueRouter);
 ```
+因为这句：我们才能使用``<router-link>``和``<router-view>``和$route和$router
 
 3. 定义路由组件
 ```js
 // 可以从其他文件 import 进来
 const Foo = { template: '<div>foo</div>' }
 const Bar = { template: '<div>bar</div>' }
+或是
+import xxx1 from './路径/xxx1.vue'
+import xxx2 from './路径/xxx2.vue'
 ```
 
 4. 定义路由
@@ -7297,9 +8423,10 @@ const app = new Vue({
   <h1>Hello App!</h1>
   <p>
     <!-- 使用 router-link 组件来导航. -->
-    <!-- 通过传入 `to` 属性指定链接. -->
+    <!-- 通过传入 `to` 属性指定链接. to='对应的path'-->
     <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
-    <router-link to="/foo">Go to Foo</router-link>
+    <!-- 如果不加tag router-link则会转化为<a> 加tag则会转化为tag的对应标签 -->
+    <router-link to="/foo" tag="div">Go to Foo</router-link>
     <router-link to="/bar">Go to Bar</router-link>
   </p>
   <!-- 路由出口 -->
@@ -7311,11 +8438,11 @@ const app = new Vue({
 
 
 
-## router-link class
-- router-link-exact-active 当前展示路径完全匹配组件to属性的值
+## router-link class 
+- router-link-exact-active 当前展示路径完全匹配组件to属性的值(就是当前选中的class值，我们一般看那个页面被选中，就看这个值)，但是可能会有这样一种情况，我们的菜单下有子菜单，那么这是你要配类router-link-exact-active就会出现选择子菜单时，对应所属菜单不被选中，这时，我们就会用类router-link-active，就可以了。
 - router-link-active  当前展示路径包含to属性的值
 
-> 更改class名
+> 更改class名，通过VueRouter修改选中的class值
 ```js
 VueRouter({
   linkActiveClass: 'link-active',
@@ -7325,8 +8452,16 @@ VueRouter({
 
 ## hash模式
 vue-router 默认 hash 模式 —— 使用 URL 的 hash 来模拟一个完整的 URL，于是当 URL 改变时，页面不会重新加载。
+URL类似于这样 ： http://localhost:8081/demo2#/demo2
+
+原理：浏览器hash模式
+location.hash = '/about'
 
 ## history 模式
+
+原理：浏览器history模式
+history.pushState(null, null, '/about');
+
 如果不想要很丑的 hash，我们可以用路由的 history 模式，这种模式充分利用 history.pushState API 来完成 URL 跳转而无须重新加载页面。
 在路由配置中设置：
 ```js
@@ -7339,3 +8474,1278 @@ VueRouter({
 不过这种模式要玩好，还需要后台配置支持。因为我们的应用是个单页客户端应用，如果后台没有正确的配置，当用户在浏览器直接访问 http://oursite.com/user/id 就会返回 404，这就不好看了。
 
 所以呢，你要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面，这个页面就是你 app 依赖的页面。
+
+举例：将路由放在一个router.js里 ，由main.js引用
+router.js
+```js
+import VueRouter from "vue-router";
+import Vue from 'vue'
+
+Vue.use(VueRouter);
+
+const routes = [{
+        path: "/",
+        component: () => import("./components/BaseDemo1.vue")
+    },
+    {
+        path: "/demo2",
+        component: () => import("./components/BaseDemo2.vue")
+    },
+    {
+        path: "/demo3",
+        component: () => import("./components/BaseDemo3.vue")
+    },
+];
+
+const router = new VueRouter({
+    //加载 路径 组件
+    routes,
+    //网络url 不用哈希，用history，普遍来讲，都用这个
+    mode: "history",
+    //类名
+    linkActiveClass: "link-active",
+    //选中完全匹配的类名
+    linkExactActiveClass: "link-exact-active",
+});
+
+export default router;
+```
+main.js
+```js
+import Vue from 'vue'
+import App from './App.vue'
+//引入写的路由文件
+import router from './router'
+
+Vue.config.productionTip = false
+
+new Vue({
+    render: h => h(App),
+    router
+}).$mount('#app')
+```
+
+
+
+
+# VueRouter_命名路由-嵌套路由-重定向-别名
+
+## 命名路由
+可以通过一个名称标识一个路由，这样在某些时候会显得更方便一些，特别是在链接一个路由，或者是执行一些跳转时，可以在创建Router实例时，在routes配置中给某个路由设置名称：
+```js
+routes = [
+  {
+    path: '/activity/personal',
+    name: 'personal',
+    component: Personal,
+  }
+];
+```
+要链接到一个命名路由，可以给 ``router-link`` 的 to 属性传一个对象：
+```html
+<router-link :to="{ name: 'personal' }">个人中心</router-link>
+```
+
+## 嵌套路由
+一个被 router-view 渲染的组件想要包含自己的嵌套 router-view 时，可以使用嵌套路由，如：
+```js
+{
+  path: '/activity',
+  component: () => import('./views/Activity'),
+  children: [
+    {
+      path: '/activity/academic',
+      name: 'academic',
+      component: () => import('./views/Academic'),
+    },
+    {
+      path: '/activity/personal',
+      name: 'personal',
+      component: () => import('./views/Personal'),
+    },
+    {
+      path: '/activity/download',
+      name: 'download',
+      component: () => import('./views/Download'),
+    }
+  ],
+}
+```
+经过这样的设置,在 Activity 组件中就可以使用 router-view 了。
+子路由的path可以简写：
+```js
+path: 'personal'
+```
+这样会自动将父路由的路径，拼接在子路由前，最终结果为：/activity/personal。
+
+举例：
+```js
+const routes = [{
+    path: '/',
+    component: () => import('./components/BaseDemo1')
+}, {
+    path: '/demo2',
+    component: () => import('./components/BaseDemo2')
+}, {
+    path: '/demo3',
+    component: () => import('./components/BaseDemo3')
+}, {
+    path: '/demo4',
+    component: () => import('./components/BaseDemo4'),
+    children: [{
+        name: '4-1',
+        //简写 完整的是 /demo4/BaseDemo4-1
+        path: "BaseDemo4-1",
+        component: () => import('./components/BaseDemo4-1')
+    }, {
+        name: '4-2',
+        path: "BaseDemo4-2",
+        component: () => import('./components/BaseDemo4-2')
+    }, {
+        name: '4-3',
+        path: "BaseDemo4-3",
+        component: () => import('./components/BaseDemo4-3')
+    }]
+}]
+```
+当访问 /activity 下的其他路径时，并不会渲染出来任何东西，如果想要渲染点什么，可以提供一个空路由：
+```js
+{
+  path: '/activity',
+  children: [
+    {
+      path: '',
+      component: () => import('./views/Academic'),
+    },
+  ],
+}
+```
+
+## 重定向
+重定向也是通过 routes 配置来完成，下面例子是从 /a 重定向到 /b，b为对应的path
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: '/b' }
+  ]
+})
+```
+举例：
+```js
+const routes = [{
+    //为了在首页直接可以显示这个组件
+    path: '/',
+    //重定向 redirect:'对应的path'
+    redirect: '/demo1'
+}, {
+    //为了让linkActiveClass类在选中别的类时不匹配上这个组件,所以给了这个组件除了'/'以外的path
+    path: '/demo1',
+    component: () => import('./components/BaseDemo1')
+}]
+const router = new VueRouter({
+    routes,
+    mode: 'history',
+    //类名
+    linkActiveClass: "link-active",
+    //选中完全匹配的类名
+    linkExactActiveClass: "link-exact-active"
+})
+```
+
+重定向的目标也可以是一个命名的路由：
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: { name: 'foo' }}
+  ]
+})
+```
+甚至是一个方法，动态返回重定向目标：
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', redirect: to => {
+      // 方法接收 目标路由 作为参数
+      // return 重定向的 字符串路径/路径对象
+    }}
+  ]
+})
+```
+
+重定向与对应children中空路径：如果对应children配置空路径，重定向则不会生效。
+比如下面的例子：
+```js
+const routes = [
+  {
+    path: '/activity',
+    component: () => import('./views/Activity'),
+    redirect(to) {
+      return {
+        name: 'academic',
+      }
+    },
+    children: [
+      {
+        path: '',
+        component: () => import('./views/Academic'),
+      },
+    ],
+  },
+];
+export default new VueRouter({
+  mode: 'history',
+  routes,
+});
+```
+
+## 别名
+“重定向”的意思是，当用户访问 /a时，URL 将会被替换成 /b，然后匹配路由为 /b，那么“别名”又是什么呢？
+
+/a 的别名是 /b，意味着，当用户访问 /b 时，URL 会保持为 /b，但是路由匹配则为 /a，就像用户访问 /a 一样。
+
+上面对应的路由配置为：
+
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/a', component: A, alias: '/b' }
+  ]
+})
+```
+
+# VueRouter_编程式的导航
+通过在 Vue 根实例的 router 配置传入 router 实例，\$router、 \$route 两个属性会被注入到每个子组件。
+
+## $router
+路由实例对象。
+
+除了使用  ``<router-link>`` 创建 a 标签来定义导航链接，我们还可以借助 router 的实例
+方法，通过编写代码来实现。
+
+### $router.push
+想要导航到不同的 URL，则使用 router.push 方法。这个方法会向 history 栈添加一个新的记录，所以，当用户点击浏览器后退按钮时，则回到之前的 URL。
+
+当你点击 ``<router-link>`` 时，这个方法会在内部调用，所以说，点击 ``<router-link :to="...">`` 等同于调用 \$router.push(...)。
+
+声明式 | 编程式
+:-: | :-:
+``<router-link :to="...">`` | this.$router.push(...) 
+
+该方法的参数可以是一个字符串路径，或者一个描述地址的对象。例如：
+```js
+// 字符串 值为path值
+this.$router.push('home')
+
+// 对象
+this.$router.push({ path: 'home' })
+
+// 命名的路由
+this.$router.push({ name: 'user' })
+```
+
+### $router.replace
+跟 router.push 很像，唯一的不同就是，它不会向 history 添加新记录，而是替换掉当前的 history 记录。
+
+声明式 | 编程式
+:-: | :-:
+``<router-link :to="..." replace>`` | this.$router.replace(...) 
+
+```js
+// 字符串 值为path值
+this.$router.replace('home')
+
+// 对象
+this.$router.replace({ path: 'home' })
+
+// 命名的路由
+this.$router.replace({ name: 'user' })
+```
+
+举例：
+```js
+export default {
+  name: "App",
+  components: {},
+  methods: {
+    handleClick() {
+      //console.log(this.$router);
+      this.$router.push("/demo1");
+      //this.$router.replace("/demo1");
+    },
+  },
+};
+```
+
+### $router.go(n)
+这个方法的参数是一个整数，意思是在 history 记录中向前或者后退多少步，类似 window.history.go(n)。
+
+```js
+//相当于刷新页面
+this.$router.go(0)
+
+// 在浏览器记录中前进一步，等同于 history.forward()
+this.$router.go(1)
+
+// 后退一步记录，等同于 history.back()
+this.$router.go(-1)
+
+// 前进 3 步记录
+this.$router.go(3)
+
+// 如果 history 记录不够用，那就默默地失败呗
+this.$router.go(-100)
+this.$router.go(100)
+```
+
+## $route
+只读，路由信息对象。
+
+### $route.path
+字符串，对应当前路由的路径，总是解析为绝对路径，如 "/foo/bar"。
+
+### $route.params
+一个 key/value 对象，包含了动态片段和全匹配片段，如果没有路由参数，就是一个空对象。
+
+```html
+<router-link :to="{ name: 'question', params: { id: question.id } }">
+  {{ question.title }}
+</router-link>
+```
+### $route.query
+一个 key/value 对象，表示 URL 查询参数。例如，对于路径 /foo?user=1，则有 \$route.query.user == 1，如果没有查询参数，则是个空对象。
+
+### $route.hash
+路由的 hash 值 (带 #) ，如果没有 hash 值，则为空字符串。
+
+### $route.fullPath
+完成解析后的 URL，包含查询参数和 hash 的完整路径。
+
+### $route.matched
+一个数组，包含当前路由的所有嵌套路径片段的路由记录 。路由记录就是 routes 配置数组中的对象副本 (还有在 children 数组)。
+    ```js
+      const router = new VueRouter({
+        routes: [
+          // 下面的对象就是路由记录
+          {
+            path: '/foo',
+            component: Foo,
+            children: [
+              // 这也是个路由记录
+              { path: 'bar', component: Bar }
+            ]
+          }
+        ]
+      })
+    ```
+
+    当 URL 为 /foo/bar，\$route.matched 将会是一个包含从上到下的所有对象 (副本)。
+
+### $route.name
+当前路由的名称，如果有的话
+
+### $route.redirectedFrom
+如果存在重定向，即为重定向来源的路由的名字。
+
+# VueRouter_动态路由匹配
+当我们需要把某种模式匹配到的所有路由，全都映射到同个组件。例如，我们有一个 User 组件，对于所有 ID 各不相同的用户，都要使用这个组件来渲染。那么，我们可以在 vue-router 的路由路径中使用“动态路径参数”来达到这个效果：
+```js
+const User = {
+  template: '<div>User</div>'
+}
+
+const router = new VueRouter({
+  routes: [
+    // 动态路径参数 以冒号开头
+    { path: '/user/:id', component: User }
+  ]
+})
+```
+经过这样的设置，像 /user/foo 和 /user/bar 都将映射到相同的路由。
+
+一个“路径参数”使用冒号 : 标记。当匹配到一个路由时，参数值会被设置到 this.$route.params，可以在每个组件内使用。
+
+# VueRouter_命名视图-路由组件传参
+
+## 命名视图
+想同时展示多个视图时，并且每个视图展示不同的组件时，可以使用命名视图。
+
+可以在界面中拥有多个单独命名的视图，而不是只有一个单独的出口。如果 router-view 没有设置名字，那么默认为 default。
+
+```html
+<router-view class="view one"></router-view>
+<router-view class="view two" name="a"></router-view>
+<router-view class="view three" name="b"></router-view>
+```
+一个视图使用一个组件渲染，因此对于同个路由，多个视图就需要多个组件。确保正确使用 components 配置 (带上 s)：
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/',
+      components: {
+        default: Foo,
+        a: Bar,
+        b: Baz
+      }
+    }
+  ]
+})
+```
+举例：
+```html
+<div class="view">
+      <router-view></router-view>
+      <router-view name="minming"></router-view>
+</div>
+```
+```js
+const routes = [{
+        path: '/demo2',
+        components: {
+            //命名为minming的路由
+            minming: () => import('./components/BaseDemo3'),
+            //如果vue文件上没写name 则默认是default
+            default: () => import('./components/BaseDemo2')
+        }
+   }
+]
+
+const router = new VueRouter({
+    routes,
+    mode: 'history',
+    //类名
+    linkActiveClass: "link-active",
+    //选中完全匹配的类名
+    linkExactActiveClass: "link-exact-active"
+})
+```
+
+## 路由组件传参
+在组件中使用 $route 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL 上使用，限制了其灵活性。    
+
+使用 props 将组件和路由解耦。
+
+### 布尔模式
+如果 props 被设置为 true，route.params 将会被设置为组件属性。
+
+举例：
+route.js
+```js
+const routes = [
+    {
+        name: 'question',
+        path: '/demo4/question/:id',
+        //设置为true
+        props: true,
+        component: () => import('./components/Question')
+    }
+]
+
+const router = new VueRouter({
+    routes,
+    mode: 'history',
+    //类名
+    linkActiveClass: "link-active",
+    //选中完全匹配的类名
+    linkExactActiveClass: "link-exact-active"
+})
+```
+Question.vue
+访问 http://localhost:8081/demo4/question/90878976，在这id为90878976
+```js
+export default {
+  //接收路由参数，如果不接收id,id则不会有值
+  props: ["id"],
+  mounted() {
+    //这里 会接收从$route传来的id值
+    console.log(this.id);
+  },
+};
+```
+
+### 对象模式
+如果 props 是一个对象，它会被按原样设置为组件属性。当 props 是静态的时候有用。
+```js
+const router = new VueRouter({
+  routes: [
+    { 
+      path: '/promotion/from-newsletter', 
+      component: Promotion, 
+      props: { id: 243232 } 
+    }
+  ]
+})
+```
+举例：
+route.js
+```js
+const routes = [
+    {
+        name: 'question',
+        path: '/demo4/question/:id',
+        //设置id 因为每个路由都需要配置一个，所以基本不用这种
+        props:{ id: 243232 } ,
+        component: () => import('./components/Question')
+    }
+]
+
+const router = new VueRouter({
+    routes,
+    mode: 'history',
+    //类名
+    linkActiveClass: "link-active",
+    //选中完全匹配的类名
+    linkExactActiveClass: "link-exact-active"
+})
+```
+Question.vue
+```js
+export default {
+  //接收路由参数，如果不接收id,id则不会有值
+  props: ["id"],
+  mounted() {
+    //这里 会接收从$route传来的id值
+    console.log(this.id);
+  },
+};
+```
+
+### 函数模式
+你可以创建一个函数返回 props。函数的第一个参数是 route （即$route）。
+```js
+const router = new VueRouter({
+  routes: [
+    { path: '/search', component: SearchUser, props: (route) => ({ query: route.query.q }) }
+  ]
+})
+```
+举例：route.js
+```js
+const routes = [
+    {
+        //具体问题页面
+        name: 'question',
+        path: '/demo4/question/:id',
+        //props为一函数 参数就是$route
+        props: route => ({
+            id: route.params.id,
+            name: route.name
+        }),
+        component: () => import('./components/Question')
+    }
+]
+
+const router = new VueRouter({
+    routes,
+    mode: 'history',
+    //类名
+    linkActiveClass: "link-active",
+    //选中完全匹配的类名
+    linkExactActiveClass: "link-exact-active"
+})
+```
+使用：Question.vue
+```js
+export default {
+  //接收路由参数，如果不接收id name,id name则不会有值
+  props: ["id", "name"],
+  data() {
+    return {
+      question: null,
+    };
+  },
+  mounted() {
+    console.log(this.id);
+    console.log(this.name);
+  }
+};
+```
+如果有别的vue文件（BaseDemo2.vue）想调用需要路由信息的vue文件(Question.vue)时
+BaseDemo2.vue
+```html
+<!-- 传参 id name -->
+ <base-question id="90878976" name="question"></base-question>
+```
+Question.vue
+```js
+export default {
+  //接收路由参数，如果不接收id name,id name则不会有值
+  props: ["id", "name"],
+  data() {
+    return {
+      question: null,
+    };
+  },
+  mounted() {
+    console.log(this.id);
+    console.log(this.name);
+  }
+};
+```
+
+
+# VueRouter_导航守卫
+导航：路由正在发生变化。
+
+导航守卫主要用来通过跳转或取消的方式守卫导航。
+
+导航守卫被分成三种：全局的、单个路由独享的、组件内的。
+
+## 全局守卫
+是指路由实例上直接操作的钩子函数，触发路由就会触发这些钩子函数。
+
+### 全局前置守卫 beforeEach
+在路由跳转前触发，一般被用于登录验证。
+
+```js
+const router = new VueRouter({ ... })
+
+router.beforeEach((to, from, next) => {
+  // ...
+})
+```
+
+参数说明：
+- to 目标路由对象
+- from 即将要离开的路由对象
+- next 三个参数中最重要的参数。
+  - 必须调用next()，才能继续往下执行一个钩子，否则路由跳转会停止
+  - 若要中断当前的导航，可以调用next(false)。
+  - 可以使用next跳转到一个不同的地址。终端当前导航，进入一个新的导航。next参数值和$routet.push一致。
+  - next(error)。2.4+，如果传入的参数是一个Error实例，则导航会被终止，且该错误会被传递给router.onError() 注册过的回调。
+
+### 全局解析守卫 beforeResolve
+和boforeEach类似，路由跳转前触发。
+
+和beforeEach的区别：在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被调用。
+
+```js
+const router = new VueRouter({ ... })
+
+router.beforeResolve((to, from, next) => {
+  // ...
+})
+```
+
+### 全局后置钩子 afterEach
+和beforeEach相反，路由跳转完成后触发。
+```js
+const router = new VueRouter({ ... })
+
+router.afterEach((to, from) => {
+  // ...
+})
+```
+
+## 路由独享守卫
+是指在单个路由配置的时候也可以设置的钩子函数。
+
+### beforeEnter
+和beforeEach完全相同，如果都设置则在beforeEach之后紧随执行。
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/home',
+      component: Home,
+      beforeEnter: (to, from, next) => {
+        // ...
+      }
+    }
+  ]
+})
+```
+
+## 组件内守卫（页面级守卫）
+是指在组件内（component）执行的钩子函数，类似于组件内的生命周期，相当于为配置路由的组件添加的生命周期钩子函数。
+
+### beforeRouteEnter
+路由进入之前调用。
+
+在该守卫内访问不到组件的实例，this值为undefined。在这个钩子函数中，可以通过传一个回调给 next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数，可以在这个守卫中请求服务端获取数据，当成功获取并能进入路由时，调用next并在回调中通过 vm访问组件实例进行赋值等操作，（next中函数的调用在mounted之后：为了确保能对组件实例的完整访问）。
+
+```js
+beforeRouteEnter (to, from, next) {
+    // 在渲染该组件的对应路由被 confirm 前调用
+    // 不！能！获取组件实例 `this`
+    // 因为当守卫执行前，组件实例还没被创建
+
+    next( vm => {
+    // 通过 `vm` 访问组件实例
+  })
+  },
+```
+
+### beforeRouteUpdate
+在当前路由改变时，并且该组件被复用时调用，可以通过this访问实例。
+
+何时组件会被复用？
+- 动态路由间互相跳转
+- 路由query变更
+
+```js
+beforeRouteUpdate (to, from, next) {
+  // 在当前路由改变，但是该组件被复用时调用
+  // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+  // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+  // 可以访问组件实例 `this`
+},
+```
+
+### beforeRouteLeave
+导航离开该组件的对应路由时调用，可以访问组件实例this。
+
+```js
+beforeRouteLeave (to, from, next) {
+  // 导航离开该组件的对应路由时调用
+  // 可以访问组件实例 `this`
+}
+```
+举例(组件)：
+```js
+export default {
+  beforeRouteUpdate(to, from, next) {
+    console.log("beforeRouteUpdate question");
+    next((vm) => {
+      //vm相当于this
+      console.log(vm);
+    });
+  },
+  beforeRouteEnter(to, from, next) {
+    console.log("beforeRouteEnter question");
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    console.log("beforeRouteLeave question");
+    next();
+  }, 
+};
+ 
+```
+
+## 完整的导航解析流程
+1. 导航被触发。
+2. 在失活的组件里调用离开守卫 组件守卫 beforeRouteLeave。
+3. 调用全局的 beforeEach 守卫。
+4. 在重用的组件里调用 beforeRouteUpdate 守卫 (2.2+)。
+5. 在路由配置里调用 beforeEnter。
+6. 解析异步路由组件。
+7. 在被激活的组件里调用 beforeRouteEnter。
+8. 调用全局的 beforeResolve 守卫 (2.5+)。
+9. 导航被确认。
+10. 调用全局的 afterEach 钩子。
+11. 触发 DOM 更新（现在已经是mounted之后）。
+12. 用创建好的实例调用 beforeRouteEnter 守卫中传给 next 的回调函数。
+
+# VueRouter_路由元信息
+定义路由的时候可以配置 meta 字段，用于自定义一些信息。路由的对应vue文件里的$route存有meta值
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+      component: Foo,
+      children: [
+        {
+          path: 'bar',
+          component: Bar,
+          meta: { requiresLogin: true }
+        }
+      ]
+    }
+  ]
+})
+```
+对应vue文件内
+```js
+export default {
+  mounted() {
+    console.log(this.$route.meta);
+  },
+};
+```
+
+# VueRouter_过渡动效-滚动行为
+## 过渡动效
+``<router-view>`` 是基本的动态组件，所以我们可以用`` <transition> ``组件给它添加一些过渡效果。
+
+```html
+<transition>
+  <router-view></router-view>
+</transition>
+```
+
+举例
+html
+```html
+<transition>
+  <router-view></router-view>
+</transition>
+```
+css
+```css
+.v-enter {
+  transform: translateX(1000px);
+}
+.v-enter-to {
+  transform: translateX(0);
+}
+.v-enter-active {
+  transition: all 0.5s;
+}
+```
+
+## 滚动行为
+使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置，就像重新加载页面那样。vue-router 可以自定义路由切换时页面如何滚动。
+
+注意: 这个功能只在支持 history.pushState 的浏览器中可用。
+
+当创建一个 Router 实例，你可以提供一个 scrollBehavior 方法：
+
+```js
+const router = new VueRouter({
+    routes,
+    mode: 'history',
+    scrollBehavior(to, from, savedPosition) {
+        // return 期望滚动到哪个的位置
+        return {
+            x: 0,
+            y: 0
+        }
+    }
+})
+```
+
+scrollBehavior 方法接收 to 和 from 路由对象。第三个参数 savedPosition 当且仅当 popstate 导航 (通过浏览器的 前进/后退 按钮触发) 时才可用。
+
+scrollBehavior 返回滚动位置的对象信息，长这样：
+
+- { x: number, y: number } 
+- { selector: string, offset? : { x: number, y: number }} (offset 只在 2.6.0+ 支持)
+
+```js
+scrollBehavior (to, from, savedPosition) {
+  return { x: 0, y: 0 }
+}
+```
+
+```js
+scrollBehavior (to, from, savedPosition) {
+  if (to.hash) {
+    return {
+      selector: to.hash // selector 的 值为 hash值
+    }
+  }
+}
+```
+举例：
+```js
+ const router = new VueRouter({
+    routes,
+    mode: 'history',
+    scrollBehavior(to, from, savedPosition) {
+        console.log(to.hash);
+        // return 期望滚动到哪个的位置
+        if (to.hash) {
+            return {
+                selector: to.hash // selector 的 值为 hash值
+            }
+        }
+    }
+})      
+```
+点击跳转链接处
+```html
+<router-link to="/demo2#a">此处可跳到demo2的a</router-link>
+```
+
+跳转到的地方
+```html
+<div id="a">a可由首页跳到此处</div>
+```
+
+# Vuex_State
+Vuex是vue的状态管理工具，为了更方便的实现多个组件共享状态。
+
+## 安装
+```js
+npm install vuex --save
+```
+
+## 使用
+```js
+import Vue from 'vue';
+import Vuex from 'vuex';
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  }
+})
+
+new Vue({
+  store,
+})
+```
+
+## State
+单一状态树，使用一个对象就包含了全部的应用层级状态。
+
+### 在Vue组件中获得Vuex状态
+Vuex 通过store 选项，提供了一种机制将状态从跟组件“注入”到每一个子组件中（调用Vue.use(Vuex)）。
+
+通过在根实例中注册store选项，该store实例会注入到根组件下的所有子组件中，且子组件能通过this.\$store访问。
+```html
+<div class="home">
+  {{ $store.state.count }}
+</div>
+```
+
+### mapState 辅助函数
+当一个组件需要获取多个状态时，将这些状态都声明为计算属性会有些重复和冗余。为了解决这个问题，我们可以使用mapState辅助函数帮助我们生成计算属性：
+
+```js
+import { mapState } from 'vuex';
+
+computed: {
+  ...mapState(['count']),
+},
+
+```
+使用不同的名字：
+```js
+computed: {
+  ...mapState({
+    storeCount: state => state.count,
+    // 简写
+    storeCount: 'count', // 等同于 state => state.count
+  }),
+},
+
+```
+
+# Vuex_Getter
+store的计算属性。getter的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。
+
+Getter 接收state作为其第一个参数、getters作为其第二个参数。
+
+```js
+getters: {
+  doubleCount (state) {
+    return state.count * 2;
+  }
+}
+```
+
+## 通过属性访问
+Getter会暴露为store.getters对象：``this.$store.getters.doubleCount``
+
+## 通过方法访问
+也可以让getter返回一个函数，来实现给getter传参
+```js
+getters: {
+  addCount: state => num => state.count + num;
+}
+```
+```js
+this.$store.addCount(3);
+```
+
+## mapGetters 辅助函数
+```js
+import { mapsGetters } from 'vuex';
+
+export default {
+  computed: {
+    ...mapGetters([
+      'doubleCount',
+      'addCount',
+    ])
+  }
+}
+```
+
+如果你想将一个 getter 属性另取一个名字，使用对象形式：
+```js
+mapGetters({
+  // 把 `this.doneCount` 映射为 `this.$store.getters.doneTodosCount`
+  storeDoubleCount: 'doubleCount'
+})
+```
+
+# Vuex_Mutation
+更改 Vuex 的 store 中的状态的唯一方法是提交 mutation。
+
+```js
+const store = new Vuex.Store({
+  state: {
+    count: 1
+  },
+  mutations: {
+    increment (state) {
+      // 变更状态
+      state.count++
+    }
+  }
+})
+```
+
+不能直接调用一个mutation handler。这个选项更像是事件注册：“当触发一个类型为``increment``的mutation时，调用次函数。”：
+```js
+this.$store.commit('increment');
+```
+
+## 在组件中提交 Mutation
+除了在组件中使用 ``this.$store.commit('xxx')`` 提交 mutation之外，还可以使用 mapMutations 辅助函数：
+```js
+import { mapMutations } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapMutations([
+      'increment', // 将 `this.increment()` 映射为 `this.$store.commit('increment')`
+    ]),
+    ...mapMutations({
+      add: 'increment' // 将 `this.add()` 映射为 `this.$store.commit('increment')`
+    })
+  }
+}
+```
+
+## 提交载荷（Payload）
+你可以向store.commit传入额外的参数，即mutation的载荷（payload）：
+```js
+mutations: {
+  increment (state, n) {
+    state.count += n
+  }
+}
+```
+```js
+store.commit('increment', 10)
+```
+在大多数情况下，载荷应该是一个对象，这样可以包含多个字段并且记录的mutation会更易读：
+```js
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+```
+```js
+store.commit('increment', {
+  amount: 10
+})
+```
+
+## 对象风格的提交方式
+提交 mutation 的另一种方式是直接使用包含 type 属性的对象：
+```js
+store.commit({
+  type: 'increment',
+  amount: 10
+})
+```
+当使用对象风格的提交方式，整个对象都作为载荷传给 mutation 函数，因此 handler 保持不变：
+```js
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+```
+
+## 使用常量替代 Mutation 事件类型
+把这些常量放在单独的文件中可以让你的代码合作者对整个 app 包含的 mutation 一目了然：
+```js
+// mutation-types.js
+export const COUNT_INCREMENT = 'COUNT_INCREMENT'
+```
+```js
+// store.js
+import Vuex from 'vuex'
+import { COUNT_INCREMENT } from './mutation-types'
+
+const store = new Vuex.Store({
+  state: { ... },
+  mutations: {
+    [COUNT_INCREMENT] (state) {
+      // ...
+    }
+  }
+})
+```
+用不用常量取决于自己，在需要多人协作的大型项目中，这会很有帮助。
+
+## Mutation 需遵守 Vue 的响应规则
+既然 Vuex 的 store 中的状态是响应式的，那么当我们变更状态时，监视状态的 Vue 组件也会自动更新。这也意味着 Vuex 中的 mutation 也需要与使用 Vue 一样遵守一些注意事项：
+
+- 最好提前在你的 store 中初始化好所有所需属性。
+- 当需要在对象上添加新属性时，你应该
+  - 使用 Vue.set(obj, 'newProp', 123), 或者
+  - 以新对象替换老对象。例如，利用对象展开运算符我们可以这样写：
+    ```js
+    state.obj = { ...state.obj, newProp: 123 }
+    ```
+
+## 表单处理
+在Vuex的state上使用v-model时，由于会直接更改state的值，所以Vue会抛出错误。
+
+如果想要使用双向数据的功能，就需要自己模拟一个v-model: :value="msg" @input="updateMsg"。
+
+### 双向绑定的计算属性
+上面的做法，比v-model本身繁琐很多，所以我们还可以使用计算属性的setter来实现双向绑定：
+```html
+<input v-model="msg">
+```
+
+```js
+computed: {
+  msg: {
+    get () {
+      return this.$store.state.obj.msg;
+    },
+    set (value) {
+      this.$store.commit(UPDATE_MSG, { value });
+    }
+  }
+}
+```
+
+## Mutation 必须是同步函数
+要记住 **mutation 必须是同步函数**。why？
+
+```js
+mutations: {
+  [COUNT_INCREMENT] (state) {
+    setTimeout(() => {
+      state.count ++;
+    }, 1000)
+  },
+}
+```
+执行上端代码，我们会发现更改state的操作是在回调函数中执行的，这样会让我们的代码在devtools中变的不好调试：当 mutation 触发的时候，回调函数还没有被调用，devtools 不知道什么时候回调函数实际上被调用，任何在回调函数中进行的状态的改变都是不可追踪的。
+
+## 严格模式
+开启严格模式，仅需在创建 store 的时候传入 strict: true：
+
+```js
+const store = new Vuex.Store({
+  // ...
+  strict: true
+})
+```
+在严格模式下，无论何时发生了状态变更且不是由 mutation 函数引起的，将会抛出错误。这能保证所有的状态变更都能被调试工具跟踪到。
+
+### 开发环境与发布环境
+不要在发布环境下启用严格模式！严格模式会深度监测状态树来检测不合规的状态变更，要确保在发布环境下关闭严格模式，以避免性能损失。
+
+```js
+const store = new Vuex.Store({
+  // ...
+  strict: process.env.NODE_ENV !== 'production'
+})
+```
+
+# Vuex_Action
+Action 类似于 mutation，不同在于：
+
+- Action 提交的是 mutation，而不是直接变更状态。
+- Action 可以包含任意异步操作
+
+Action 函数接受一个与 store 实例具有相同方法和属性的 context 对象，因此你可以调用 context.commit 提交一个 mutation，或者通过 context.state 和 context.getters 来获取 state 和 getters:
+
+```js
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  },
+  actions: {
+    increment (context) {
+      context.commit('increment')
+    }
+  }
+})
+```
+
+## 分发Action
+```js
+store.dispatch('increment')
+```
+虽然和mutation差不多，但是在action中，可以执行异步操作，但是mutation中不行！！！
+```js
+actions: {
+  incrementAsync ({ commit }) {
+    setTimeout(() => {
+      commit('increment')
+    }, 1000)
+  }
+}
+```
+
+
+## 组合 Action
+Action 通常是异步的，那么如何知道 action 什么时候结束呢？
+```js
+actions: {
+  actionA ({ commit }) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        commit('someMutation')
+        resolve()
+      }, 1000)
+    })
+  }
+}
+```
+```js
+store.dispatch('actionA').then(() => {
+  // ...
+})
+```
+
+## Vuex 管理模式
+![](https://vuex.vuejs.org/vuex.png)
+
+# Vuex_Module
+由于使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store 对象就有可能变得相当臃肿。
+
+为了解决以上问题，Vuex 允许我们将 store 分割成模块（module）。每个模块拥有自己的 state、mutation、action、getter。
+
+```js
+modules: {
+  a,
+  b
+}
+```
+- 获取 state：this.\$store.state.moduleName.xxx
+- 获取 getter：this.\$store.getters.xxx
+- 提交 mutation：this.\$store.commit('xxx');
+- 分发 action：this.\$store.dispatch('xxx');
+- 可以通过mapXXX的方式拿到getters、mutations、actions，但是不能拿到state，如果想通过这种方式获得state，需要加命名空间。
+
+## 命名空间
+可以通过添加 namespaced: true 的方式使其成为带命名空间的模块。
+- 获取 state：this.\$store.state.moduleName.xxx
+- 获取 getter：this.\$store.['moduleName/getters'].xxx
+- 提交 mutation：this.\$store.commit('moduleName/xxx');
+- 分发 action：this.\$store.dispatch('moduleName/xxx');
+- 可以通过mapXXX的方式获取到state、getters、mutations、actions。
+
+## 模块的局部状态
+
+对于模块内部的 mutation 和 getter，接收的第一个参数是模块的局部状态对象。
+
+同样，对于模块内部的 action，局部状态通过 context.state 暴露出来，根节点状态则为 context.rootState。
+
+对于模块内部的 getter，根节点状态会作为第三个参数暴露出来。
