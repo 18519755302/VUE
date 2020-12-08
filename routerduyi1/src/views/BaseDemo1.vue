@@ -4,6 +4,8 @@
     <button @click="$store.state.count++">+1</button>
     <hr />
     {{ storeCount }}
+
+    {{ addCount(3) }}
     <div class="buttom">
       <router-link to="/demo2">demo2</router-link>
       <router-link to="/demo2#a">此处可跳到demo2的a</router-link>
@@ -12,11 +14,10 @@
 </template>
 <script>
 //获取mapState，以便从中找到count值
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 export default {
   mounted() {
-    console.log(mapState(["count"]));
-    console.log(this.$store.state.count);
+    console.log(mapGetters(["addCount"]));
   },
   //分享名和自己起的名相同，可这样写
   //computed: mapState(["count"]),
@@ -31,6 +32,9 @@ export default {
       //storeCount: (state) => state.count,
       //语法糖 自己起的名字："分享名"
       storeCount: "count",
+    }),
+    ...mapGetters({
+      addCount: "addCount",
     }),
   },
 };

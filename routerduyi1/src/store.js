@@ -9,5 +9,20 @@ export default new Vuex.Store({
     state: {
         count: 0,
         studentList: []
+    },
+    getters: {
+        studentsLength(state) {
+            return state.studentList.length;
+        },
+        addCount: (state) => {
+            return num => state.count + num;
+        },
+        //addCount: state => num => state.count + num
+        studentsUnderAge(state) {
+            return state.studentList.filter(item => {
+                return item.age < 18
+            })
+        }
+
     }
 });

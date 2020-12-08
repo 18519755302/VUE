@@ -1,16 +1,16 @@
 <template>
   <div>
-    <add-student />
+    <student-add />
     <hr />
     <student-list />
   </div>
 </template>
 <script>
-import AddStudent from "@/components/AddStudent";
+import StudentAdd from "@/components/StudentAdd";
 import StudentList from "@/components/StudentList";
 export default {
   components: {
-    AddStudent,
+    StudentAdd,
     StudentList,
   },
 };
