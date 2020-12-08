@@ -13,10 +13,10 @@ const routes = [{
         name: 'demo1',
         //为了让linkActiveClass类在选中别的类时不匹配上这个组件
         path: '/demo1',
-        component: () => import('./components/BaseDemo1'),
+        component: () => import('./views/BaseDemo1'),
     }, {
         path: '/demo2',
-        component: () => import('./components/BaseDemo2'),
+        component: () => import('./views/BaseDemo2'),
         beforeEnter: (to, from, next) => {
             next();
         }
@@ -28,7 +28,7 @@ const routes = [{
         // }
     }, {
         path: '/demo3',
-        component: () => import('./components/BaseDemo3'),
+        component: () => import('./views/BaseDemo3'),
         meta: {
             login: true
         },
@@ -38,7 +38,7 @@ const routes = [{
         }
     }, {
         path: '/demo4',
-        component: () => import( /* webpackChunkName:"demo4-1"*/ './components/BaseDemo4'),
+        component: () => import( /* webpackChunkName:"demo4-1"*/ './views/BaseDemo4'),
         redirect(to) {
             return {
                 name: '4-1',
@@ -54,15 +54,15 @@ const routes = [{
         children: [{
             name: '4-1',
             path: "BaseDemo4-1",
-            component: () => import( /* webpackChunkName:"demo4-1"*/ './components/BaseDemo4-1')
+            component: () => import( /* webpackChunkName:"demo4-1"*/ './views/BaseDemo4-1')
         }, {
             name: '4-2',
             path: "BaseDemo4-2",
-            component: () => import('./components/BaseDemo4-2')
+            component: () => import('./views/BaseDemo4-2')
         }, {
             name: '4-3',
             path: "BaseDemo4-3",
-            component: () => import('./components/BaseDemo4-3')
+            component: () => import('./views/BaseDemo4-3')
         }]
     },
     {
