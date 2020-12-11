@@ -52,5 +52,17 @@ export default new Vuex.Store({
         input(state, value) {
             state.msg = value;
         }
+    },
+    actions: {
+        countPlusNAction(context, payload) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    context.commit('countPlusPayload', payload);
+                    //promise返回值
+                    resolve();
+                }, 1000)
+            })
+        }
     }
+
 });

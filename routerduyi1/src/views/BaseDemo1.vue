@@ -22,8 +22,7 @@
   </div>
 </template>
 <script>
-//获取mapMutations
-import { mapState, mapGetters, mapMutations } from "vuex";
+import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 import { COUNT_PLUS } from "../store/mutation-types";
 export default {
   mounted() {},
@@ -48,6 +47,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["countPlusNAction"]),
     //多个方法可以在数组里加入，也可以单独写一个mapMutations放入方法名
     ...mapMutations(["countPlus", "countPlusTwo"]),
     // ...mapMutations(["countPlusTwo"]),
@@ -62,9 +62,17 @@ export default {
       //this.$store.commit("countPlusN", 10);
       //第②种方法
       //this.$store.commit("countPlusPayload", { n: 10 });
-      this.$store.commit({
-        type: "countPlusPayload",
-        n: 10,
+      // this.$store.commit({
+      //   type: "countPlusPayload",
+      //   n: 10,
+      // });
+      //第①种Action提交方法
+      //this.$store.dispatch("countPlusNAction", { n: 10 });
+      //第②种Action提交方法
+      //this.countPlusNAction({ n: 10 });
+      //第③中Action中使用异步
+      this.$store.dispatch("countPlusNAction", { n: 10 }).then(() => {
+        alert("ok");
       });
     },
     changeObj() {
