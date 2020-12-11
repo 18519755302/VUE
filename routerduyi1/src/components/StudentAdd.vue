@@ -18,7 +18,9 @@ export default {
   },
   methods: {
     handleClick() {
-      this.$store.state.studentList.push({
+      // 严格模式下 会报没用matation提交，但是功能好使
+      // 非严格模式下 ok
+      this.$store.state.student.studentList.push({
         name: this.name,
         age: this.age,
         id: +new Date(),

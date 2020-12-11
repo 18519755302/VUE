@@ -6,7 +6,9 @@
     <button @click="plusTen">+10</button>
     <button @click="changeObj">changeObj</button>
     <hr />
-    {{ storeCount }}
+    {{ storeCount.count }}
+    <!-- 模块化 ：$store.state.模块名.xxx -->
+    {{ $store.state.count.count }}
     {{ addCount(3) }}
     {{ this.obj }}
     <!-- <hr />
@@ -34,7 +36,8 @@ export default {
       obj: "obj",
       //msg: "msg",
     }),
-    ...mapGetters({
+    //如果用mapGetters
+    ...mapGetters("count", {
       addCount: "addCount",
     }),
     msg: {
@@ -48,13 +51,13 @@ export default {
   },
   methods: {
     ...mapActions(["countPlusNAction"]),
-    //多个方法可以在数组里加入，也可以单独写一个mapMutations放入方法名
-    ...mapMutations(["countPlus", "countPlusTwo"]),
+    //命名空间写法 空间名 count
+    ...mapMutations("count", ["countPlus", "countPlusTwo"]),
     // ...mapMutations(["countPlusTwo"]),
     //也可单独写法方法，放入vuex定义好的Mutation名
     plus() {
       //this.$store.commit("countPlus");
-      this.$store.commit(COUNT_PLUS);
+      this.$store.commit("count/" + COUNT_PLUS);
     },
     //Mutation中方法加参数
     plusTen() {
@@ -71,7 +74,7 @@ export default {
       //第②种Action提交方法
       //this.countPlusNAction({ n: 10 });
       //第③中Action中使用异步
-      this.$store.dispatch("countPlusNAction", { n: 10 }).then(() => {
+      this.$store.dispatch("count/countPlusNAction", { n: 10 }).then(() => {
         alert("ok");
       });
     },
