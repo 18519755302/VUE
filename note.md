@@ -8371,6 +8371,10 @@ button {
 ## 安装路由
 > 安装：``npm install vue-router``。
 
+vue/cli 这个命令集中有一条是 @代表路径从src开始算
+举例：路径为src/components/
+import AddStudent from "@/components/AddStudent";
+
 ## 使用路由
 ### JavaScript
 1. 引入路由
@@ -8383,7 +8387,12 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 ```
 因为这句：我们才能使用``<router-link>``和``<router-view>``和$route和$router
-
+这句其实用的就是js中的install函数，我们通常用一个js文件来写
+```js
+export default function install(Vue) {
+            ......
+}
+```
 3. 定义路由组件
 ```js
 // 可以从其他文件 import 进来
@@ -9377,12 +9386,16 @@ npm install vuex --save
 ## 使用
 ```js
 import Vue from 'vue';
+//引入vuex
 import Vuex from 'vuex';
 
+//使用Vuex
 Vue.use(Vuex);
-
+//根实例中注册store选项
 const store = new Vuex.Store({
+  //state为分享数据的置物架
   state: {
+    //分享数据
     count: 0
   }
 })
@@ -9410,24 +9423,54 @@ Vuex 通过store 选项，提供了一种机制将状态从跟组件“注入”
 
 ```js
 import { mapState } from 'vuex';
-
+//可写为
+computed: mapState(["count"]),
+//也可写为
 computed: {
   ...mapState(['count']),
 },
 
 ```
-使用不同的名字：
+要使用不同的名字：
 ```js
 computed: {
   ...mapState({
+    //如果用分享值原名则可以这样写
+    //count,  
+    //自己给分享值起的名:函数 state => {return state.count}
     storeCount: state => state.count,
     // 简写
-    storeCount: 'count', // 等同于 state => state.count
+    storeCount: 'count', //语法糖， 等同于 state => state.count
   }),
 },
 
 ```
-
+举例：vue组件
+```js
+//获取mapState，以便从中找到count值
+import { mapState } from "vuex";
+export default {
+  mounted() {
+    console.log(mapState(["count"]));
+    console.log(this.$store.state.count);
+  },
+  //分享名和自己起的名相同，可这样写
+  //computed: mapState(["count"]),
+  //也可以这样写
+  // computed: {
+  //   ...mapState(["count"]),
+  // },
+  //如果分享名和自己起的名不相同
+  computed: {
+    ...mapState({
+      //自己起的名：函数
+      //storeCount: (state) => state.count,
+      //语法糖 自己起的名字："分享名"
+      storeCount: "count",
+    }),
+  },
+};
+```
 # Vuex_Getter
 store的计算属性。getter的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。
 
@@ -9450,11 +9493,66 @@ Getter会暴露为store.getters对象：``this.$store.getters.doubleCount``
 getters: {
   addCount: state => num => state.count + num;
 }
+//相当于
+getters:{
+  addCount: (state) => {
+    return num => state.count + num;
+  }
+}
 ```
+使用getters
 ```js
 this.$store.addCount(3);
 ```
-
+或者
+```js
+export default {
+  computed: {
+    ...mapGetters({
+      addCount: "addCount",
+    }),
+  },
+};
+```
+举例：
+```html
+<div>
+    <button @click="$store.state.count++">+1</button>
+    {{ storeCount }}
+    {{ addCount(3) }}
+</div>
+```
+使用的vue文件
+```js
+import { mapState, mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapState({
+      //自己起的名：函数
+      //storeCount: (state) => state.count,
+      //语法糖 自己起的名字："分享名"
+      storeCount: "count",
+    }),
+    ...mapGetters({
+      addCount: "addCount",
+    }),
+  },
+};
+```
+store.js
+```js
+export default new Vuex.Store({
+    state: {
+        count: 0,
+        studentList: []
+    },
+    getters: {
+        addCount: (state) => {
+            return num => state.count + num;
+        },
+    }
+});
+```
 ## mapGetters 辅助函数
 ```js
 import { mapsGetters } from 'vuex';
@@ -9478,7 +9576,7 @@ mapGetters({
 ```
 
 # Vuex_Mutation
-更改 Vuex 的 store 中的状态的唯一方法是提交 mutation。
+在Vuex严格模式中，更改 Vuex 的 store 中的状态的唯一方法是提交 mutation。
 
 ```js
 const store = new Vuex.Store({
@@ -9516,6 +9614,40 @@ export default {
   }
 }
 ```
+举例：
+store.js
+```js
+export default new Vuex.Store({
+    state: {
+        count: 0,
+        studentList: []
+    },
+    mutations: {
+        countPlus(state) {
+            state.count++;
+        },
+        countPlusTwo(state) {
+            state.count += 2;
+        }
+    }
+});
+```
+组件中
+```js
+//获取mapMutations
+import { mapState, mapGetters, mapMutations } from "vuex";
+export default {
+  methods: {
+    //多个方法可以在数组里加入，也可以单独写一个mapMutations放入方法名
+    ...mapMutations(["countPlus", "countPlusTwo"]),
+    // ...mapMutations(["countPlusTwo"]),
+    //也可单独写法方法，放入vuex定义好的Mutation名
+    plus() {
+      this.$store.commit("countPlus");
+    },
+  },
+};
+```
 
 ## 提交载荷（Payload）
 你可以向store.commit传入额外的参数，即mutation的载荷（payload）：
@@ -9526,8 +9658,11 @@ mutations: {
   }
 }
 ```
+组件中使用
 ```js
-store.commit('increment', 10)
+ methods: {
+    store.commit('increment', 10)
+ }
 ```
 在大多数情况下，载荷应该是一个对象，这样可以包含多个字段并且记录的mutation会更易读：
 ```js
@@ -9542,9 +9677,45 @@ store.commit('increment', {
   amount: 10
 })
 ```
+举例：
+store.js
+```js
+export default new Vuex.Store({
+    state: {
+        count: 0,
+        studentList: []
+    },
+    mutations: {
+        countPlusN(state, n) {
+            state.count += n;
+        },
+        countPlusPayload(state, payload) {
+            state.count += payload.n;
+        }
+    }
+});
+```
+组件中
+```js
+//获取mapMutations
+import {mapMutations } from "vuex";
+export default {
+  methods: {
+    //Mutation中方法加参数
+    plusTen() {
+      //第①种方法
+      //this.$store.commit("countPlusN", 10);
+      //第②种方法
+      this.$store.commit("countPlusPayload", { n: 10 });
+    },
+  },
+};
+```
+
 
 ## 对象风格的提交方式
 提交 mutation 的另一种方式是直接使用包含 type 属性的对象：
+vue组件中
 ```js
 store.commit({
   type: 'increment',
@@ -9564,6 +9735,7 @@ mutations: {
 把这些常量放在单独的文件中可以让你的代码合作者对整个 app 包含的 mutation 一目了然：
 ```js
 // mutation-types.js
+//提交的mutation 名字都是大写
 export const COUNT_INCREMENT = 'COUNT_INCREMENT'
 ```
 ```js
@@ -9574,12 +9746,58 @@ import { COUNT_INCREMENT } from './mutation-types'
 const store = new Vuex.Store({
   state: { ... },
   mutations: {
+    //由于是使用的导出常量作为方法名，所以要加中括号
     [COUNT_INCREMENT] (state) {
       // ...
     }
   }
 })
 ```
+举例：
+mutation-types.js
+```js
+export const COUNT_PLUS = 'COUNT_PLUS';
+```
+store.js
+```js
+import Vue from 'vue';
+import Vuex from 'vuex';
+import {
+    COUNT_PLUS
+} from './store/mutation-types';
+
+//vue使用Vuex
+Vue.use(Vuex);
+
+//注册Store选项，并导出
+export default new Vuex.Store({
+    state: {
+        count: 0,
+        studentList: []
+    },
+    mutations: {
+        [COUNT_PLUS](state) {
+            state.count++;
+        }
+    }
+});
+```
+组件中使用
+```js
+//获取mapMutations
+import { mapState, mapGetters, mapMutations } from "vuex";
+import { COUNT_PLUS } from "../store/mutation-types";
+export default {
+  mounted() {},
+  methods: {
+    plus() {
+      //this.$store.commit("countPlus");
+      this.$store.commit(COUNT_PLUS);
+    },
+  },
+};
+```
+
 用不用常量取决于自己，在需要多人协作的大型项目中，这会很有帮助。
 
 ## Mutation 需遵守 Vue 的响应规则
@@ -9592,6 +9810,34 @@ const store = new Vuex.Store({
     ```js
     state.obj = { ...state.obj, newProp: 123 }
     ```
+举例：
+store.js
+```js
+export default new Vuex.Store({
+    state: {
+        obj: {
+            a: 1
+        }
+    },
+});
+```
+组件中使用
+```js
+export default {
+  mounted() {},
+  computed: {
+    ...mapState({
+      //用于验证
+      obj: "obj",
+    }),
+  },
+  methods: {
+    changeObj() {
+      this.$store.state.obj = { ...this.$store.state.obj, b: 123 };
+    },
+  },
+};
+```
 
 ## 表单处理
 在Vuex的state上使用v-model时，由于会直接更改state的值，所以Vue会抛出错误。
@@ -9615,6 +9861,60 @@ computed: {
     }
   }
 }
+```
+举例：
+store.js
+```js
+export default new Vuex.Store({
+    state: {
+        msg: ''
+    },
+    mutations: {
+        input(state, value) {
+            state.msg = value;
+        }
+    }
+});
+```
+组件中使用
+```html
+<template>
+  <div>
+    <!-- <hr />
+    <input type="text" :value="msg" @input="input" />
+    {{ msg }} -->
+    <hr />
+    <input type="text" v-model="msg" />
+    {{ msg }}
+  </div>
+</template>
+```
+```js
+//获取mapMutations
+import { mapState, mapGetters, mapMutations } from "vuex";
+import { COUNT_PLUS } from "../store/mutation-types";
+export default {
+  computed: {
+    ...mapState({
+      //msg: "msg",
+    }),
+    //第二种方法 实现v-model
+    msg: {
+      get() {
+        return this.$store.state.msg;
+      },
+      set(value) {
+        this.$store.commit("input", value);
+      },
+    },
+  },
+  methods: {
+    //第一种方法 实现v-model
+    input(e) {
+      this.$store.commit("input", e.target.value);
+    },
+  },
+};
 ```
 
 ## Mutation 必须是同步函数
@@ -9682,7 +9982,8 @@ const store = new Vuex.Store({
 ```js
 store.dispatch('increment')
 ```
-虽然和mutation差不多，但是在action中，可以执行异步操作，但是mutation中不行！！！
+虽然和mutation差不多，但是在action中，可以执行异步操作，但是mutation中不行！！！因为mutation
+store.js
 ```js
 actions: {
   incrementAsync ({ commit }) {
@@ -9692,10 +9993,56 @@ actions: {
   }
 }
 ```
+举例：
+store.js
+```js
+export default new Vuex.Store({
+    //要是生产模式的话就关闭严格模式
+    strict: process.env.NODE_ENV !== 'production',
+    state: {
+        count: 0,
+    },
+    mutations: {
+        countPlusPayload(state, payload) {
+            state.count += payload.n;
+        }
+    },
+    actions: {
+        countPlusNAction(context, payload) {
+            setTimeout(() => {
+                context.commit('countPlusPayload', payload);
+            }, 1000)
+        }
+    }
 
+});
+```
+组件中使用
+```js
+import { mapState, mapActions } from "vuex";
+export default {
+  computed: {
+    ...mapState({
+      //语法糖 自己起的名字："分享名"
+      storeCount: "count",
+    }),
+  },
+  methods: {
+    ...mapActions(["countPlusNAction"]),
+    //Mutation中方法加参数
+    plusTen() {
+      //第①种Action提交方法
+      //this.$store.dispatch("countPlusNAction", { n: 10 });
+      //第②种Action提交方法
+      this.countPlusNAction({ n: 10 });
+    }
+  },
+};
+```
 
 ## 组合 Action
 Action 通常是异步的，那么如何知道 action 什么时候结束呢？
+store.js中
 ```js
 actions: {
   actionA ({ commit }) {
@@ -9708,16 +10055,66 @@ actions: {
   }
 }
 ```
+组件中
 ```js
 store.dispatch('actionA').then(() => {
   // ...
 })
 ```
+举例：
+store.js
+```js
+export default new Vuex.Store({
+    strict: process.env.NODE_ENV !== 'production',
+    state: {
+        count: 0,
+    },
+    mutations: {
+        countPlusPayload(state, payload) {
+            state.count += payload.n;
+        },
+    },
+    actions: {
+        countPlusNAction(context, payload) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    context.commit('countPlusPayload', payload);
+                    //promise返回值
+                    resolve();
+                }, 1000)
+            })
+        }
+    }
+
+});
+```
+组件中使用
+```js
+import { mapState, mapActions } from "vuex";
+export default {
+  computed: {
+    ...mapState({
+      //语法糖 自己起的名字："分享名"
+      storeCount: "count",
+    }),
+  },
+  methods: {
+    plusTen() {
+      this.$store.dispatch("countPlusNAction", { n: 10 }).then(() => {
+        alert("ok");
+      });
+    },
+  },
+};
+```
+
 
 ## Vuex 管理模式
+如果state改变不需要异步，则Vue Components可以直接指向Mutations
+
 ![](https://vuex.vuejs.org/vuex.png)
 
-# Vuex_Module
+# Vuex_Module(模块)
 由于使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store 对象就有可能变得相当臃肿。
 
 为了解决以上问题，Vuex 允许我们将 store 分割成模块（module）。每个模块拥有自己的 state、mutation、action、getter。
@@ -9735,12 +10132,71 @@ modules: {
 - 可以通过mapXXX的方式拿到getters、mutations、actions，但是不能拿到state，如果想通过这种方式获得state，需要加命名空间。
 
 ## 命名空间
-可以通过添加 namespaced: true 的方式使其成为带命名空间的模块。
+在命名空间内添加 namespaced: true 的方式使其成为带命名空间的模块。
 - 获取 state：this.\$store.state.moduleName.xxx
 - 获取 getter：this.\$store.['moduleName/getters'].xxx
 - 提交 mutation：this.\$store.commit('moduleName/xxx');
 - 分发 action：this.\$store.dispatch('moduleName/xxx');
 - 可以通过mapXXX的方式获取到state、getters、mutations、actions。
+
+举例：
+各命名组件count.js：
+```js
+export default {
+    namespaced: true,
+    state: {
+        count: 0,
+    },
+    getters: {
+      ....
+    },
+    mutations: {
+      ....
+    },
+    actions: {
+       ....
+    }
+};
+```
+组件使用
+```js
+import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
+import { COUNT_PLUS } from "../store/mutation-types";
+export default {
+  mounted() {},
+  computed: {
+    ...mapState({
+      //语法糖 自己起的名字："分享名"
+      storeCount: "count",
+      //用于验证
+      obj: "obj",
+      //msg: "msg",
+    }),
+    //count为命名空间
+    ...mapGetters("count", {
+      addCount: "addCount",
+    }),
+  },
+  methods: {
+    //命名空间写法 空间名 count
+    ...mapMutations("count", ["countPlus", "countPlusTwo"]),
+    plus() {
+      //使用命名空间 count为命名空间
+      this.$store.commit("count/" + COUNT_PLUS);
+    },
+    //Mutation中方法加参数
+    plusTen() {
+      //使用命名空间 count为命名空间
+      this.$store.dispatch("count/countPlusNAction", { n: 10 }).then(() => {
+        alert("ok");
+      });
+    },
+    input(e) {
+      this.$store.commit("input", e.target.value);
+    },
+  },
+};
+```
 
 ## 模块的局部状态
 
@@ -9749,3 +10205,22 @@ modules: {
 同样，对于模块内部的 action，局部状态通过 context.state 暴露出来，根节点状态则为 context.rootState。
 
 对于模块内部的 getter，根节点状态会作为第三个参数暴露出来。
+
+举例：模块 count.js中
+```js
+export default {
+  namespaced: true,
+  state: {
+    count: 0,
+  },
+  getters: {
+    countDouble: (state, getters, rootState) => {
+      //可以打印模块状态
+      console.log(getters,rootState);
+      return state.count * 2
+    },
+    countAdd: state => num => state.count + num,
+  },
+  
+}
+```
