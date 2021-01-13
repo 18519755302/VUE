@@ -46,12 +46,25 @@ export default class moduleCollection {
 
     /**
      * @desc 根据路径获取模块
-     * @param {*} path 
+     * @param {Array} path 
      */
     get(path) {
         let result = path.reduce((module, curValue) => {
             return module.children[curValue];
         }, this.root);
+        return result;
+    }
+
+    /**
+     * 根据路径得到对应命名空间名字
+     * @param {Array} path 
+     */
+    getNamespace(path) {
+        let module = this.root;
+        let result = path.reduce((namespace, key) => {
+            module = module.getChild(key);
+            return namespace + (module.isNamespaced() ? key + "/" : '');
+        }, '')
         return result;
     }
 }
