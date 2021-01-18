@@ -2390,8 +2390,12 @@ vm.$watch(
     // 干了点事儿
   }, 
   {
+    //是否进行深度执行（用于对象，如果开启，则对象内部数据改变，就是执行第二个参数）  
     deep: Boolean, 
-    immediate: Boolean
+    //是否立刻执行
+    immediate: Boolean,
+    //是否开启同步
+    sync:Boolean
   }
 )
 
@@ -9712,6 +9716,85 @@ export default {
 };
 ```
 
+## 模块中定义mutation
+
+①如果在student模块中定义mutation，且student模块有命名空间
+则调用时
+```js
+export default {
+  methods: {
+    handleClick() {
+      //调用时需带入模块名 student
+      this.$store.commit("student/addCount", { num: 1 });
+    },
+  },
+};
+```
+定义mutation
+```js
+export default new Vuex.Store({
+    modules: {
+        student: {
+            //命名空间
+            namespaced: true,
+            state: {
+                num: 100
+            },
+            //定义mutation
+            mutations: {
+                addCount(state, payLoad) {
+                    state.num += payLoad.num;
+                },
+            }
+
+        },
+    },
+    state: {
+        count: 0
+    },
+    
+})
+```
+@如果在模块中定义mutation，但是该模块没有命名空间
+调用时规则同定义在主模块一样
+```js
+export default {
+  methods: {
+    handleClick() {
+      //同在主模块中调用规定相同
+      this.$store.commit({
+        type: "addCount",
+        num: 10,
+      });
+    },
+  },
+};
+```
+定义mutation
+```js
+export default new Vuex.Store({
+    modules: {
+        student: {
+            state: {
+                num: 100
+            },
+            mutations: {
+                //在没有命名空间的模块中定义mutation
+                addCount(state, payLoad) {
+                    state.num += payLoad.num;
+                },
+            }
+
+        },
+       
+    },
+    state: {
+        count: 0
+    },
+    
+})
+```
+③在没有命名空间的模块中定义的mutation与在主模块中定义的名字如果相同了，我们调用这个mutation时，则主模块和模块中的mutation都会执行
 
 ## 对象风格的提交方式
 提交 mutation 的另一种方式是直接使用包含 type 属性的对象：

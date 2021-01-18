@@ -1,7 +1,8 @@
 import mixin from './mixin'
 import ModuleCollection from './module/module-collection'
 import {
-    forEachValue
+    forEachValue,
+    isObject
 } from './util'
 
 /** 实现getters
@@ -23,7 +24,24 @@ import {
  * 4.2.4 根模块getters
  */
 
-
+/** 实现mutation
+ * 1. 将各个模块上的mutations都统一的放到store上，无论是root上的还是其他子模块上
+ *  store._mutations = {
+ *    countAdd: [fn, fn],
+ *    numAdd: [fn]
+ *  }
+ * 
+ * 2. 如果有命名空间。对应的mutation函数的名字前应该加上命名空间的名字，如：
+ *  store._mutations = {
+ *    countAdd: [fn],
+ *    student/numAdd: [fn]
+ *    student/countAdd: [fn]
+ *  }
+ * 
+ * 3. 由于需要commit一个mutation。所以在store上应有commit方法
+ * 
+ * 4. 在严格模式下，只能通过mutation更改state，通过其他的方式需要报出警告
+ */
 
 let Vue;
 //挂载$store
@@ -36,6 +54,7 @@ export function install(_vue) {
 
 export class Store {
     constructor(options) {
+
         //将参数变为 ModuleCollection （实现store state）
         this.moduleCollection = new ModuleCollection(options);
         //获取主干root上的state （实现store state）
@@ -47,10 +66,40 @@ export class Store {
         //getters缓存 ***
         this._makeLocalGetterCache = {};
 
+        //实现 mutations
+        this._mutations = {};
+
+        //是否开始严格模式
+        this.strict = !!options.strict;
+
+        //判断是否提交mutation去更改状态
+        this._commiting = false;
+
         //将参数moduleCollection 加入state （实现store state）（实现getters）
         installState(this, [], this.state, this.moduleCollection.root);
         //重置vm （实现store state）（实现getters）
         resetStoreVm(this, options.state);
+    }
+
+    //用commit方法提交所调用的mutation函数 （实现mutation 3）
+    commit(_type, _payload) {
+        let {
+            type,
+            payload
+        } = unifyStyle(_type, _payload);
+        // 入口函数数组
+        let entry = this._mutations[type];
+        this._withCommit(() => {
+            entry.forEach(fn => fn(payload));
+        })
+    }
+
+    //通过mutation去改变state （实现mutation 4）
+    _withCommit(fn) {
+        let commiting = this._commiting;
+        this._commiting = true;
+        fn();
+        this._commiting = commiting;
     }
 }
 
@@ -62,7 +111,6 @@ export class Store {
  * @param {Object} module 模块
  */
 function installState(store, path, rootState, module) {
-
     const isRoot = path.length === 0;
     if (!isRoot) {
         //获取父模块
@@ -78,9 +126,9 @@ function installState(store, path, rootState, module) {
         installState(store, path.concat(key), rootState, module.children[key]);
     });
 
-    //获得命名空间名字 （实现getters）
+    //获得命名空间名字 （实现getters 实现mutation 2）
     let namespace = store.moduleCollection.getNamespace(path);
-    //获得本地上下文 （实现getters 实现4.2）
+    //获得本地上下文 （实现getters--实现4.2 实现mutation 1）
     let local = getLocalContext(store, path, namespace);
     //遍历module的getters，得到$store._wrappedGetters（实现getters）
     module.forEachGetters((key, fn) => {
@@ -90,10 +138,38 @@ function installState(store, path, rootState, module) {
         //store._wrappedGetters[key] = value; 这样写参数传不进去
         registerGetter(store, getterName, fn, local);
     });
+
+    //遍历mutation 注册_mutations （实现mutation 1）
+    module.forEachMutations((name, fn) => {
+        let mutationName = namespace + name;
+        //注册store._mutations
+        registerMutation(store, mutationName, fn, local);
+    });
+
 }
 
 /**
- * 获取本地上下文（实现getters）
+ * 注册Mutation（ 实现mutation 1）
+ * @param {Store} Store实例 store
+ * @param {String} mutationName 
+ * @param {*} fn 
+ * @param {*} local 
+ */
+function registerMutation(store, mutationName, fn, local) {
+    // 使store._mutations = {
+    //      countAdd: [fn, fn],
+    //      numAdd: [fn] 
+    //  }，方法集中在数组里
+    let mutationArr = store._mutations[mutationName] || (store._mutations[mutationName] = []);
+    mutationArr.push((payload) => {
+        //使用call 这样调用fn时的this可以指向store
+        fn.call(store, local.state, payload);
+    });
+}
+
+
+/**
+ * 获取本地上下文（实现getters）（实现mutation）
  * @param {Store} Store 实例
  * @param {Array} path 路径
  * @param {String} namespace 命名空间的名字
@@ -131,8 +207,6 @@ function getLocalContext(store, path, namespace) {
             enumerable: true
         }
     })
-
-
     return local;
 }
 
@@ -189,7 +263,7 @@ function getModuleState(path, rootState) {
 }
 
 /**
- * 重置vm（ 实现store state）（ 实现getters）
+ * 重置vm（ 实现store state）（ 实现getters）（实现mutation）
  * @param {*} store store实例
  * @param {*} state state值
  */
@@ -220,4 +294,50 @@ function resetStoreVm(store, state) {
         },
         computed
     })
+
+    //实现mutation 4
+    //是否开启严格模式（如果开启严格模式，则vuex中state改变必须通过store中commit方法）
+    if (store.strict) {
+        enableStrictMode(store);
+    }
+
+
+}
+
+/**
+ * 统一传来的参数风格（ 实现mutation 3）
+ * @param {String or Object}} type 所调用的mutation方法名 如果是对象则是方法名和载荷
+ * @param {Object or undefined} payload 载荷
+ */
+function unifyStyle(type, payload) {
+    if (isObject(type)) {
+        payload = type;
+        type = type.type;
+    }
+    return {
+        type,
+        payload
+    }
+}
+
+/**
+ * 开启严格模式（在严格模式下更新state）(实现mutation 4)
+ * @param {Store} Store实例 store 
+ */
+function enableStrictMode(store) {
+    store._vm.$watch(
+        function () {
+            return this.state;
+        }, () => {
+            //如果state改变，且没有提交commit则报错
+            if (!store._commiting) {
+                throw new Error('[vuex] do not mutate vuex store state outside mutation handlers.');
+            }
+        }, {
+            //开启深度执行
+            deep: true,
+            //是否开启同步
+            sync: true
+        }
+    )
 }

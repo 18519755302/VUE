@@ -36,7 +36,7 @@ export default class Module {
     }
 
     /**
-     * 循环执行getters执行fn
+     * 循环getters执行fn
      * @param {*} 函数fn 
      */
     forEachGetters(fn) {
@@ -47,7 +47,18 @@ export default class Module {
         }
     }
 
-
+    /**
+     * 循环Mutations,执行fn
+     * @param {Function} 函数fn 
+     */
+    forEachMutations(fn) {
+        //console.log(this.rawModule);
+        if (this.rawModule.mutations) {
+            forEachValue(this.rawModule.mutations, (key, value) => {
+                fn(key, value);
+            })
+        }
+    }
 
 
 

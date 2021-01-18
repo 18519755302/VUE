@@ -8,6 +8,7 @@ Vue.use(Vuex);
 
 //会调用./vuex/index.js中导出的类Store
 export default new Vuex.Store({
+    strict: true,
     modules: {
         student: {
             namespaced: true,
@@ -23,12 +24,20 @@ export default new Vuex.Store({
                         twoB(state) {
                             return 2 * state.b;
                         }
-                    }
+                    },
                 }
             },
             getters: {
                 doubleNum(state, getters, rootState, rootGetters) {
                     return state.num * 2;
+                },
+            },
+            mutations: {
+                addNum(state, payLoad) {
+                    state.num += payLoad.num;
+                },
+                addCount(state, payLoad) {
+                    state.num += payLoad.num;
                 }
             }
 
@@ -47,5 +56,10 @@ export default new Vuex.Store({
             // console.log(state, getter);
             return state.count * 2;
         }
+    },
+    mutations: {
+        addCount(state, payLoad) {
+            state.count += payLoad.num;
+        },
     }
 })
