@@ -13,3 +13,10 @@
       */
      return typeof obj === 'object' && obj !== null;
  }
+
+ export function isPromise(val) {
+     /**
+      * 判断是否为Promise
+      */
+     return val && typeof val.then === 'function';
+ }

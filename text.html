@@ -11,12 +11,16 @@
     <script>
         function a() {
             console.log('a');
+            return '1';
         }
 
         function b() {
+            console.log('b');
+            //a();
             return a();
         }
-        b();
+        let c = b();
+        console.log(c);
     </script>
 </body>
 

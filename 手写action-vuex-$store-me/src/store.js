@@ -34,19 +34,30 @@ export default new Vuex.Store({
             },
             mutations: {
                 addNum(state, payLoad) {
+                    console.log('子模块');
                     state.num += payLoad.num;
                 },
                 addCount(state, payLoad) {
+                    console.log('子模块!');
                     state.num += payLoad.num;
+                }
+            },
+            actions: {
+                studentAddNum({
+                    commit,
+                    dispatch
+                }, payload) {
+                    //commit('addCount', payload);
+                    dispatch('addCountActionSame', payload);
+                },
+                addCountActionSame({
+                    dispatch
+                }, payload) {
+                    console.log('子模块');
                 }
             }
 
-        },
-        // studentTwo: {
-        //     state: {
-        //         num: 200
-        //     }
-        // }
+        }
     },
     state: {
         count: 0
@@ -61,5 +72,18 @@ export default new Vuex.Store({
         addCount(state, payLoad) {
             state.count += payLoad.num;
         },
+    },
+    actions: {
+        addCountAction({
+            commit
+        }, payload) {
+            console.log('我是主模块');
+            commit('addCount', payload);
+        },
+        addCountActionSame({
+            dispatch
+        }, payload) {
+            console.log('主模块');
+        }
     }
 })

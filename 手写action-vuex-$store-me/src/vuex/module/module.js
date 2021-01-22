@@ -60,7 +60,17 @@ export default class Module {
         }
     }
 
-
+    /**
+     * 循环actions,执行fn
+     * @param {Function} 函数fn 
+     */
+    forEachActions(fn) {
+        if (this.rawModule.actions) {
+            forEachValue(this.rawModule.actions, (key, value) => {
+                fn(key, value);
+            })
+        }
+    }
 
 
 }
