@@ -120,7 +120,8 @@ export class Store {
         //判断是否提交mutation去更改状态
         this._commiting = false;
 
-
+        //每个拥有命名空间的模块将存于这里，用于实现vuex辅助功能
+        this._modulesNamespaceMap = {};
 
 
         //将参数moduleCollection 加入state （实现store state）（实现getters）
@@ -194,8 +195,14 @@ function installState(store, path, rootState, module) {
 
     //获得命名空间名字 （实现getters 实现mutation 2）
     let namespace = store.moduleCollection.getNamespace(path);
+
+    //为实现vuex辅助功能
+    if (namespace) {
+        store._modulesNamespaceMap[namespace] = module;
+    }
+
     //获得本地上下文 （实现getters--实现4.2 实现mutation 1）
-    let local = getLocalContext(store, path, namespace);
+    let local = module.context = getLocalContext(store, path, namespace);
     //遍历module的getters，得到$store._wrappedGetters（实现getters）
     module.forEachGetters((key, fn) => {
         //实现getters 4.1

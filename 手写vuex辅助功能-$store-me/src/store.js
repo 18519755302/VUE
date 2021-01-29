@@ -15,18 +15,6 @@ export default new Vuex.Store({
             state: {
                 num: 100
             },
-            modules: {
-                a: {
-                    state: {
-                        b: 101
-                    },
-                    getters: {
-                        twoB(state) {
-                            return 2 * state.b;
-                        }
-                    },
-                }
-            },
             getters: {
                 doubleNum(state, getters, rootState, rootGetters) {
                     return state.num * 2;
@@ -37,17 +25,13 @@ export default new Vuex.Store({
                     console.log('子模块');
                     state.num += payLoad.num;
                 },
-                addCount(state, payLoad) {
-                    console.log('子模块!');
-                    state.num += payLoad.num;
-                }
             },
             actions: {
                 studentAddNum({
                     commit,
                     dispatch
                 }, payload) {
-                    //commit('addCount', payload);
+                    commit('addNum', payload);
                     dispatch('addCountActionSame', payload);
                 },
                 addCountActionSame({
@@ -64,7 +48,6 @@ export default new Vuex.Store({
     },
     getters: {
         doubleCount(state, getter) {
-            // console.log(state, getter);
             return state.count * 2;
         }
     },
@@ -79,11 +62,6 @@ export default new Vuex.Store({
         }, payload) {
             console.log('我是主模块');
             commit('addCount', payload);
-        },
-        addCountActionSame({
-            dispatch
-        }, payload) {
-            console.log('主模块');
         }
     }
 })
