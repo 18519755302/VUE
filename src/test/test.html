@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .tips {
+            position: fixed;
+            top: 0;
+            margin-top: 50px;
+            left: calc(50% - 75px);
+            border-radius: 5px;
+            width: 150px;
+            height: 37px;
+            line-height: 40px;
+            text-align: center;
+        }
+
+        .suc {
+            background-color: #f0f9eb;
+            color: #67c23a;
+        }
+
+        .fail {
+            background-color: #fef0f0;
+            color: #f56c6c;
+        }
+
+        .fadeIn {
+            animation: fadeIn 1s;
+        }
+
+        .fadeOut {
+            animation: fadeOut 1s;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                top: -100%;
+                opacity: 0;
+            }
+
+            100% {
+                top: 0;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                top: 0;
+                opacity: 1;
+            }
+
+            100% {
+                top: -100%;
+                opacity: 0;
+            }
+        }
+    </style>
+    <script crossorigin="anonymous" integrity="sha384-+jvb+jCJ37FkNjPyYLI3KJzQeD8pPFXUra3B/QJFqQ3txYrUPIP1eOfxK4h3cKZP"
+        src="https://lib.baomitu.com/vue/2.6.11/vue.js"></script>
+</head>
+
+<body>
+    <input type="button" value="知不知道" id="btn">
+    <div class="tips" :class="type" v-show="flag">
+        {{msg}}
+    </div>
+    <script>
+        let vm = new Vue({
+            el: ".tips",
+            data() {
+                return {
+                    msg: 'OK',
+                    flag: false,
+                    type: 'suc'
+                }
+            }
+        });
+
+        let btn = document.getElementById('btn');
+        let tip = document.getElementsByClassName('tips')[0];
+        btn.addEventListener('click', function () {
+            vm.flag = true;
+            tip.classList.remove('fadeOut');
+            tip.classList.add('fadeIn');
+            setTimeout(() => {
+                vm.flag = false;
+            }, 4000)
+            //浮动框停留时间
+            setTimeout(() => {
+                tip.classList.remove('fadeIn');
+                tip.classList.add('fadeOut');
+            }, 3000)
+
+        })
+    </script>
+</body>
+
+</html>
